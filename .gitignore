@@ -1,0 +1,6 @@
+*.bak
+*.sw?
+*.tmp
+*~
+.DS_Store
+testdata-output/
