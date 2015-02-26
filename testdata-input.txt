@@ -1,4 +1,6 @@
 testdata/kringel.png
+testdata/scan-0200-inv.png
+testdata/scan-0200.png
 testdata/pbm/kringel_bw160.pbm
 testdata/pbm/kringel_bw161.pbm
 testdata/pbm/kringel_bw162.pbm

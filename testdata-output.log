@@ -2,12 +2,12 @@
 ### TEST: inkscape-centerline-trace.py
 ########################################
 ### git describe --all --long
-heads/master-0-g08a1f77
+heads/test-0-gedfaf1f
 ### git status -s
-A  .gitignore
-A  Makefile
-A  testdata-input.txt
-AD testdata-output.log
+M  testdata-input.txt
+MD testdata-output.log
+A  testdata/scan-0200-inv.png
+A  testdata/scan-0200.png
 ########################################
 # Create test output dir: <testdata-output>
 ########################################
@@ -25,164 +25,182 @@ sha1sum: 6b631e4d419e78269da30e9c4412dc72e6bcdea0
 
 ########################################
 ### TEST[002] start
+cmd: ./inkscape-centerline-trace.py testdata/scan-0200-inv.png > testdata-output/testdata/scan-0200-inv.png.svg
+file: testdata-output/testdata/scan-0200-inv.png.svg
+size: 1262
+wc: 5 140 1262
+sha1sum: 938be35d9bce434f8ae79741b1feb5fd88d82a0c
+### TEST[002] end
+
+########################################
+### TEST[003] start
+cmd: ./inkscape-centerline-trace.py testdata/scan-0200.png > testdata-output/testdata/scan-0200.png.svg
+file: testdata-output/testdata/scan-0200.png.svg
+size: 764
+wc: 5 80 764
+sha1sum: f6d95a0059631ee1a108d537ea83d0c44a61f50f
+### TEST[003] end
+
+########################################
+### TEST[004] start
 cmd: ./inkscape-centerline-trace.py testdata/pbm/kringel_bw160.pbm > testdata-output/testdata/pbm/kringel_bw160.pbm.svg
 # Create test output dir: <testdata-output/testdata/pbm>
 file: testdata-output/testdata/pbm/kringel_bw160.pbm.svg
 size: 260
 wc: 5 28 260
 sha1sum: 2bc3d1ddeb660785e068f0f9054fb1e6e1569394
-### TEST[002] end
+### TEST[004] end
 
 ########################################
-### TEST[003] start
+### TEST[005] start
 cmd: ./inkscape-centerline-trace.py testdata/pbm/kringel_bw161.pbm > testdata-output/testdata/pbm/kringel_bw161.pbm.svg
 file: testdata-output/testdata/pbm/kringel_bw161.pbm.svg
 size: 271
 wc: 5 30 271
 sha1sum: 0137ffb6876f473c4afa6cf3a13d72b2d0d39a40
-### TEST[003] end
+### TEST[005] end
 
 ########################################
-### TEST[004] start
+### TEST[006] start
 cmd: ./inkscape-centerline-trace.py testdata/pbm/kringel_bw162.pbm > testdata-output/testdata/pbm/kringel_bw162.pbm.svg
 file: testdata-output/testdata/pbm/kringel_bw162.pbm.svg
 size: 379
 wc: 5 44 379
 sha1sum: 0110524e3580aedf01082a2e02579e55d0f66da4
-### TEST[004] end
+### TEST[006] end
 
 ########################################
-### TEST[005] start
+### TEST[007] start
 cmd: ./inkscape-centerline-trace.py testdata/pbm/kringel_bw163.pbm > testdata-output/testdata/pbm/kringel_bw163.pbm.svg
 file: testdata-output/testdata/pbm/kringel_bw163.pbm.svg
 size: 506
 wc: 5 61 506
 sha1sum: bd19ca158d09686adf995ff80ec90755c265a487
-### TEST[005] end
+### TEST[007] end
 
 ########################################
-### TEST[006] start
+### TEST[008] start
 cmd: ./inkscape-centerline-trace.py testdata/pbm/kringel_bw164.pbm > testdata-output/testdata/pbm/kringel_bw164.pbm.svg
 file: testdata-output/testdata/pbm/kringel_bw164.pbm.svg
 size: 452
 wc: 5 56 452
 sha1sum: a68f41a8ed85d117532d68af774126f394d283eb
-### TEST[006] end
+### TEST[008] end
 
 ########################################
-### TEST[007] start
+### TEST[009] start
 cmd: ./inkscape-centerline-trace.py testdata/pbm/kringel_bw165.pbm > testdata-output/testdata/pbm/kringel_bw165.pbm.svg
 file: testdata-output/testdata/pbm/kringel_bw165.pbm.svg
 size: 476
 wc: 5 56 476
 sha1sum: 9d52bf9d2ba7d8487ba723cbd021471237781fe7
-### TEST[007] end
+### TEST[009] end
 
 ########################################
-### TEST[008] start
+### TEST[010] start
 cmd: ./inkscape-centerline-trace.py testdata/pbm/kringel_bw170.pbm > testdata-output/testdata/pbm/kringel_bw170.pbm.svg
 file: testdata-output/testdata/pbm/kringel_bw170.pbm.svg
 size: 453
 wc: 5 50 453
 sha1sum: 0fe88dd50883bc60e2f4989fa5e90ade78e004e4
-### TEST[008] end
+### TEST[010] end
 
 ########################################
-### TEST[009] start
+### TEST[011] start
 cmd: ./inkscape-centerline-trace.py testdata/pbm/kringel_bw175.pbm > testdata-output/testdata/pbm/kringel_bw175.pbm.svg
 file: testdata-output/testdata/pbm/kringel_bw175.pbm.svg
 size: 478
 wc: 5 53 478
 sha1sum: 9fe800f75e24bce94779d4b846a0026692c32c0e
-### TEST[009] end
+### TEST[011] end
 
 ########################################
-### TEST[010] start
+### TEST[012] start
 cmd: ./inkscape-centerline-trace.py testdata/pbm/kringel_bw180.pbm > testdata-output/testdata/pbm/kringel_bw180.pbm.svg
 file: testdata-output/testdata/pbm/kringel_bw180.pbm.svg
 size: 441
 wc: 5 49 441
 sha1sum: 825d50ea54c316d4bad723cc38fb741493994d69
-### TEST[010] end
+### TEST[012] end
 
 ########################################
-### TEST[011] start
+### TEST[013] start
 cmd: ./inkscape-centerline-trace.py testdata/pbm/kringel_bw185.pbm > testdata-output/testdata/pbm/kringel_bw185.pbm.svg
 file: testdata-output/testdata/pbm/kringel_bw185.pbm.svg
 size: 443
 wc: 5 48 443
 sha1sum: 28be83cbed3b8b061afb5ede06bd27e6ebaba18e
-### TEST[011] end
+### TEST[013] end
 
 ########################################
-### TEST[012] start
+### TEST[014] start
 cmd: ./inkscape-centerline-trace.py testdata/pbm/kringel_bw190.pbm > testdata-output/testdata/pbm/kringel_bw190.pbm.svg
 file: testdata-output/testdata/pbm/kringel_bw190.pbm.svg
 size: 467
 wc: 5 50 467
 sha1sum: 65e31afa55683b838ecb50127020480ffa1d824d
-### TEST[012] end
+### TEST[014] end
 
 ########################################
-### TEST[013] start
+### TEST[015] start
 cmd: ./inkscape-centerline-trace.py testdata/pbm/kringel_bw195.pbm > testdata-output/testdata/pbm/kringel_bw195.pbm.svg
 file: testdata-output/testdata/pbm/kringel_bw195.pbm.svg
 size: 552
 wc: 5 58 552
 sha1sum: 3bb2031b23e2c560540f9fbe244ac5d3008f89b4
-### TEST[013] end
+### TEST[015] end
 
 ########################################
-### TEST[014] start
+### TEST[016] start
 cmd: ./inkscape-centerline-trace.py testdata/pbm/kringel_bw200.pbm > testdata-output/testdata/pbm/kringel_bw200.pbm.svg
 file: testdata-output/testdata/pbm/kringel_bw200.pbm.svg
 size: 503
 wc: 5 56 503
 sha1sum: eb0eae499b61eff0c23e14c90605e7d2a716c3a4
-### TEST[014] end
+### TEST[016] end
 
 ########################################
-### TEST[015] start
+### TEST[017] start
 cmd: ./inkscape-centerline-trace.py testdata/pbm/kringel_bw205.pbm > testdata-output/testdata/pbm/kringel_bw205.pbm.svg
 file: testdata-output/testdata/pbm/kringel_bw205.pbm.svg
 size: 634
 wc: 5 69 634
 sha1sum: 5637c0e64adcdf3b70671d969947c062568f9964
-### TEST[015] end
+### TEST[017] end
 
 ########################################
-### TEST[016] start
+### TEST[018] start
 cmd: ./inkscape-centerline-trace.py testdata/pbm/kringel_bw210.pbm > testdata-output/testdata/pbm/kringel_bw210.pbm.svg
 file: testdata-output/testdata/pbm/kringel_bw210.pbm.svg
 size: 413
 wc: 5 43 413
 sha1sum: 8637a42a29ac87dbc4a663ca7d6d6d19d24b9bbb
-### TEST[016] end
+### TEST[018] end
 
 ########################################
-### TEST[017] start
+### TEST[019] start
 cmd: ./inkscape-centerline-trace.py testdata/pbm/kringel_bw215.pbm > testdata-output/testdata/pbm/kringel_bw215.pbm.svg
 file: testdata-output/testdata/pbm/kringel_bw215.pbm.svg
 size: 533
 wc: 5 57 533
 sha1sum: 87138d12c27627cc70e41993e4af937423e64fb0
-### TEST[017] end
+### TEST[019] end
 
 ########################################
-### TEST[018] start
+### TEST[020] start
 cmd: ./inkscape-centerline-trace.py testdata/pbm/kringel_bw220.pbm > testdata-output/testdata/pbm/kringel_bw220.pbm.svg
 file: testdata-output/testdata/pbm/kringel_bw220.pbm.svg
 size: 447
 wc: 5 46 447
 sha1sum: f76b54a1486d69114e3a8808e2258961548d9dfe
-### TEST[018] end
+### TEST[020] end
 
 ########################################
-### TEST[019] start
+### TEST[021] start
 cmd: ./inkscape-centerline-trace.py testdata/pbm/kringel_bw225.pbm > testdata-output/testdata/pbm/kringel_bw225.pbm.svg
 file: testdata-output/testdata/pbm/kringel_bw225.pbm.svg
 size: 406
 wc: 5 42 406
 sha1sum: fcd75e949c901f19def767ab57a75ed8f75d0062
-### TEST[019] end
+### TEST[021] end
 
