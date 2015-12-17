@@ -9,3 +9,5 @@ See centerline-tracing.svg for an illustration of the idea.
 
 Unfinished command line tool. 
 Works great with testdata, to be integrated into inkscape.
+
+<embed centerline-trace-poster.svg>
