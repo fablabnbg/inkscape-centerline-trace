@@ -4,9 +4,12 @@
 # as a path along the centerline of the strokes.
 #
 # This is done with autotrace -centerline, as
-# the builtin potrace in inkscape cannot do centerline.
-# It will always draw a path around the contour of the 
+# the builtin potrace in inkscape cannot do centerline --
+# it would always draw a path around the contour of the 
 # stroke, resulting in double lines.
+#
+# We want a stroke represented by a single path (optionally with line-width) , 
+# rather than its outline contour.
 #
 # Algorithm:
 # autotrace needs a bi-level bitmap. In order to find the
