@@ -18,7 +18,9 @@ Works great with testdata, to be integrated into inkscape.
 
 
 Algorithm:
-autotrace needs a bi-level bitmap. In order to find the
+The input image is converted to a graymap and histogram normalized with PIL.ImageOps.equalize.
+
+Autotrace needs a bi-level bitmap. In order to find the
 best threshold value, we run autotrace at multiple thresholds
 and evaluate the results.
 
