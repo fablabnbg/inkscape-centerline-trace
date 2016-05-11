@@ -15,3 +15,15 @@ Works great with testdata, to be integrated into inkscape.
 <p>
 
 <a href="https://raw.githubusercontent.com/fablabnbg/inkscape-centerline-trace/master/centerline-trace-poster.svg"><img src="https://raw.githubusercontent.com/fablabnbg/inkscape-centerline-trace/master/centerline-trace-poster.png" /></a>
+
+
+Algorithm:
+autotrace needs a bi-level bitmap. In order to find the
+best threshold value, we run autotrace at multiple thresholds
+and evaluate the results.
+
+We count the number of line segments produced and 
+measure the total path length drawn.
+The svg that has the longest path but the least number of
+segments is returned.
+
