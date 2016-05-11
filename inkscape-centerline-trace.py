@@ -22,7 +22,8 @@
 # The svg that has the longest path but the least number of
 # segments is returned.
 #
-# 
+# Requires: 
+# apt-get install autotrace
 
 import sys, os, re, math, tempfile, subprocess
 import xml.etree.ElementTree as ET
@@ -97,7 +98,14 @@ for i in range(num_attempts):
   fp.write("P4\n%d %d\n" % (bw.size[0], bw.size[1]))
   fp.write(bw.tobytes())
   fp.close()
-  p = subprocess.Popen(autotrace_cmd + [fp.name], stdout=subprocess.PIPE)
+  try:
+    p = subprocess.Popen(autotrace_cmd + [fp.name], stdout=subprocess.PIPE)
+  except Exception as e:
+    print '+ '+' '.join(autotrace_cmd)
+    print e
+    print "Try:\n  sudo apt-get install autotrace"
+    sys.exit(1)
+
   cand['svg'] = p.communicate()[0]
   os.unlink(fp.name)
   # <?xml version="1.0" standalone="yes"?>\n<svg width="86" height="83">\n<path style="stroke:#000000; fill:none;" d="M36 15C37.9219 18.1496 41.7926 19.6686 43.2585 23.1042C47.9556 34.1128 39.524 32.0995 35.179 37.6034C32.6296 40.8328 34 48.1105 34 52M36 17C32.075 22.4565 31.8375 30.074 35 36M74 42L46 38C45.9991 46.1415 46.7299 56.0825 45.6319 64C44.1349 74.7955 23.7094 77.5566 16.044 72.3966C7.27363 66.4928 8.04426 45.0047 16.2276 38.7384C20.6362 35.3626 27.7809 36.0006 33 36M44 37L45 37"/>\n</svg>

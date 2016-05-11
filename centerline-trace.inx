@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<inkscape-extension xmlns="http://www.inkscape.org/namespace/inkscape/extension">
+  <_name>Centerline Trace</_name>
+  <id>com.github.fablabnbg.inskscape-centerline-trace</id>
+  <dependency type="extension">org.inkscape.output.svg.inkscape</dependency>
+  <dependency type="executable" location="extensions">inkex.py</dependency>
+  <dependency type="executable" location="extensions">centerline-trace.py</dependency>
+
+  <!-- Keep in sync with chain_paths.py line 16 __version__ = ... -->
+  <param name="about_version" type="description">
+  
+  
+  https://github.com/fablabnbg/inkscape-centerline-trace
+  Version 0.1</param>
+
+  <effect needs-live-preview="false" >
+    <object-type>path</object-type>
+    <effects-menu>
+      <submenu _name="Images"/>
+    </effects-menu>
+  </effect>
+  <script>
+      <command reldir="extensions" interpreter="python">centerline-trace.py</command>
+  </script>
+</inkscape-extension>
