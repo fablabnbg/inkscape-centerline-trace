@@ -11,7 +11,7 @@
   
   
   https://github.com/fablabnbg/inkscape-centerline-trace
-  Version 0.1</param>
+  Version 0.2</param>
 
   <effect needs-live-preview="false" >
     <object-type>path</object-type>
