@@ -1,6 +1,7 @@
 # a simple makefile to release packages
 
 DEST=/usr/share/inkscape/extensions
+DISTNAME=inkscape-centerline-trace
 
 dist:
 	cd distribute; sh ./distribute.sh
@@ -13,3 +14,5 @@ install:
 
 clean:
 	rm -f *.orig */*.orig
+	rm -rf distribute/$(DISTNAME)
+	rm -rf distribute/deb/files

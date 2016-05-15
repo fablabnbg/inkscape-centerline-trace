@@ -22,6 +22,7 @@ echo "Build Ubuntu Version (Y/n)?"
 read answer
 if [ "$answer" != "n" ]
 then
+  mkdir -p deb/files
   cp -a $name/* deb/files
   (cd deb && sh ./dist.sh $name $VERSION)
 fi

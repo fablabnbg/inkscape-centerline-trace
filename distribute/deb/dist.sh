@@ -4,7 +4,7 @@
 name=$1
 vers=$2
 url=http://github.com/fablabnbg/inkscape-centerline-trace
-requires="bash, python3-PIL|python-PIL, autotrace"
+requires="autotrace, python3-PIL | bash, python-PIL"
 
 tmp=../out
 
@@ -16,6 +16,6 @@ fakeroot checkinstall --fstrans --reset-uid --type debian \
   --pkglicense LGPL --pkggroup other --pakdir ../$tmp --pkgsource $url \
   --pkgaltsource "http://fablab-nuernberg.de" \
   --maintainer "'Juergen Weigert (juewei@fabmail.org)'" \
-  --requires "$requires" make install \
-  -e PREFIX=/usr > /dev/null || { echo "error"; exit 1; }
+  --requires "'$requires'" make install \
+  -e PREFIX=/usr || { echo "error"; exit 1; }
 
