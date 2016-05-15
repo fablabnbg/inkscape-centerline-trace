@@ -27,4 +27,8 @@ then
 fi
 
 
+echo "Built packages are in distribute/out :"
+ls -la out
+echo "Cleaning up..."
 rm -rf $name
+echo "done."
