@@ -3,7 +3,8 @@
 # as a standaloine tool
 
 image=$1 
-test -z "$image" && image=./testdata/kringel.png
+test -z "$image" && image=testdata/kringel.png
+case "$image" in .*) ;; /*) ;; *) image=./$image;; esac
 tmpsvg=/tmp/$$-centerline-trace-wrapper.svg
 
 cat << EOF > $tmpsvg
