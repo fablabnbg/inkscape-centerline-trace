@@ -47,7 +47,6 @@ __version__ = '0.2'	# Keep in sync with chain_paths.inx ca line 22
 __author__ = 'Juergen Weigert <juewei@fabmail.org>'
 
 import sys, os, re, math, tempfile, subprocess, base64
-import inkex, simplestyle
 
 try:
   from PIL import Image
@@ -72,7 +71,7 @@ else:   				# linux
   sys.path.append('/usr/share/inkscape/extensions')
 
 # inkscape libraries
-import inkex
+import inkex, simplestyle
 import cubicsuperpath
 
 inkex.localize()
@@ -257,7 +256,7 @@ class TraceCenterline(inkex.Effect):
     for id, node in self.selected.iteritems():
       if debug: print >>self.tty, "id="+str(id), "tag="+str(node.tag)
       if node.tag != inkex.addNS('image','svg'):
-        inkex.errormsg(_("Object "+id+" is not an image. Try\n  - Object->Ungroup"))
+        inkex.errormsg(_("Object "+id+" is not an image. seen:"+str(node.tag)+" expected:"+inkex.addNS('image','svg')+"\n Try - Object->Ungroup"))
         return
       # handle two cases. Embedded and linked images
       # <image .. xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAT8AA ..." preserveAspectRatio="none" height="432" width="425" transform="matrix(1,0,-0.52013328,0.85408511,0,0)"/>
