@@ -1,6 +1,14 @@
 #!/bin/sh
-# shell script wrapper to run an inkscape extension 
-# as a standaloine tool
+# shell script wrapper to run the centerline-trace 
+# inkscape extension as a standalone tool
+#
+# (c) 2016, juewei@fabmail.com
+
+opts='--invert=False'
+# opts='--candidates=15'
+# opts='--megapixels=2.0'
+# opts='--megapixel=0.5 --invert=True --candidates=5'
+# opts='--invert=True'
 
 image=$1 
 test -z "$image" && image=testdata/kringel.png
@@ -35,5 +43,5 @@ cat << EOF > $tmpsvg
 </svg>
 EOF
 
-python centerline-trace.py --id=image4421 $tmpsvg
+python centerline-trace.py $opts --id=image4421 $tmpsvg
 #rm $tmpsvg

@@ -2,6 +2,7 @@
 #
 # Inkscape extension to vectorize bitmaps by tracing along the center of lines
 # (C) 2016 juewei@fabmail.org
+# Distribute under GPL-2.0 or ask.
 #
 # code snippets visited to learn the extension 'effect' interface:
 # - convert2dashes.py
@@ -24,7 +25,7 @@
 #
 # Algorithm:
 #
-# The input image is converted to a graymap and histogram normalized with PIL.ImageOps.equalize.
+# The input image is converted to a graymap and histogram normalized with PIL.ImageOps.equalize. or autocontrast
 #
 # autotrace needs a bi-level bitmap. In order to find the
 # best threshold value, we run autotrace at multiple thresholds
@@ -41,9 +42,10 @@
 #
 # 2016-05-10 jw, V0.1 -- initial draught
 # 2016-05-11 jw, V0.2 -- first usable inkscape-extension
+# 2016-05-15 jw, V0.3 -- equal spatial illumination applied. autocontrast instead of equalize. denoise.
 #
 
-__version__ = '0.2'	# Keep in sync with chain_paths.inx ca line 22
+__version__ = '0.3'	# Keep in sync with chain_paths.inx ca line 22
 __author__ = 'Juergen Weigert <juewei@fabmail.org>'
 
 import sys, os, re, math, tempfile, subprocess, base64
@@ -52,12 +54,13 @@ try:
   from PIL import Image
   from PIL import ImageOps
   from PIL import ImageStat
+  from PIL import ImageFilter
 except:
   print >>sys.stderr, "Error: Cannot import PIL. Try\n  apt-get install python-pil"
   sys.exit(1)
 
 
-#debug = True
+# debug = True
 debug = False
 
 # search path, so that inkscape libraries are found when we are standalone.
@@ -93,7 +96,12 @@ class TraceCenterline(inkex.Effect):
     inkex.Effect.__init__(self)
 
     self.dumpname= os.path.join(tempfile.gettempdir(), "trace-centerline.dump")
-    self.autotrace_opts=[]		# extra options for autotrace tuning.
+    self.autotrace_opts=[]		 # extra options for autotrace tuning.
+    self.megapixel_limit = 2.0		 # max image size (limit needed, as we have no progress indicator)
+    self.invert_image = False		 # True: trace bright lines.
+    self.candidates = 15		 # [1..255] Number of autotrace candidate runs.
+    self.filter_median = 0		 # 0 to disable median filter.
+    self.filter_equal_light = 0.0        # [0.0 .. 1.9] Use 1.0 with photos. Use 0.0 with perfect scans.
 
     try:
       self.tty = open("/dev/tty", 'w')
@@ -107,6 +115,15 @@ class TraceCenterline(inkex.Effect):
     self.OptionParser.add_option('-V', '--version',
           action = 'store_const', const=True, dest='version', default=False,
           help='Just print version number ("'+__version__+'") and exit.')
+    self.OptionParser.add_option('-i', '--invert', action='store', type='inkbool', default=False, help='Trace bright lines. (Default: dark lines)')
+    self.OptionParser.add_option('-m', '--megapixels', action='store',
+          type='float', default=2.0, help="Limit image size in megapixels. (Lower is faster)")
+    self.OptionParser.add_option('-e', '--equal-light', action='store',
+          type='float', default=0.0, help="Equalize illumination. Use 1.0 with flash photography, use 0.0 to disable.")
+    self.OptionParser.add_option('-c', '--candidates', action='store',
+          type='int', default=15, help="[1..255] Autotrace candidate runs. (Lower is much faster)")
+    self.OptionParser.add_option('-d', '--despecle', action='store',
+          type='int', default=0, help="[0..9] Apply median filter for noise reduction. (Default 0, off)")
 
   def version(self):
     return __version__
@@ -114,18 +131,51 @@ class TraceCenterline(inkex.Effect):
     return __author__
 
   def svg_centerline_trace(self, image_file):
-    num_attempts = 15	# min 1, max 255, beware it gets much slower with more attempts.
+    """ svg_centerline_trace prepares the image by
+    a) limiting_size (aka runtime), 
+    b) removing noise, 
+    c) linear histogram expansion, 
+    d) equalized spatial illumnination (my own algorithm)
+
+    Then we run several iterations of autotrace and find the optimal black white threshold by evaluating
+    all outputs. The output with the longest total path and the least path elements wins.
+    """
+    num_attempts = self.candidates	# 15 is great. min 1, max 255, beware it gets much slower with more attempts.
     autotrace_cmd = ['autotrace', '--centerline', '--input-format=pbm', '--output-format=svg' ]
     autotrace_cmd += self.autotrace_opts
 
     stroke_style_add = 'stroke-width:%.2f; fill:none; stroke-linecap:round;'
 
-    if debug: print >>self.tty, image_file
+    if debug: print >>sys.stderr, "svg_centerline_trace start "+image_file
     im = Image.open(image_file)
     im = im.convert(mode='L', dither=None)
     if debug: print >>sys.stderr, "seen: " + str([im.format, im.size, im.mode])
-    im = ImageOps.equalize(im)	# equalize histogram
-    #im.show()
+    scale_limit = math.sqrt(im.size[0] * im.size[1] * 0.000001 / self.megapixel_limit)
+    if scale_limit > 1.0:
+      print >>sys.stderr, "Megapixel limit ("+str(self.megapixel_limit)+ ") exceeded. Scaling down by factor : "+str(scale_limit)
+      im = im.resize((int(im.size[0]/scale_limit), int(im.size[1]/scale_limit)), resample = Image.BILINEAR)
+
+    if self.invert_image: im = ImageOps.invert(im)
+
+    if self.filter_median > 0:
+      if self.filter_median % 2 == 0: self.filter_median = self.filter_median + 1	# need odd values.
+      im = im.filter(ImageFilter.MedianFilter(size=self.filter_median))	# a feeble denoise attempt. FIXME: try ROF instead.
+    im = ImageOps.autocontrast(im, cutoff=2)	# linear expand histogram (an alternative to equalize)
+
+    # not needed here:
+    # im = im.filter(ImageFilter.UnsharpMask(radius=2, percent=150, threshold=3))	# parameters depend on size of image!
+
+    if self.filter_equal_light > 0.0:
+      scale_thumb = math.sqrt(im.size[0] * im.size[1] * 0.0001) 	# exactly 0.01 MP (e.g. 100x100)
+      im_neg_thumb = ImageOps.invert(im.resize((int(im.size[0]/scale_thumb), int(im.size[1]/scale_thumb)), resample = Image.BILINEAR))
+      im_neg_thumb = im_neg_thumb.filter(ImageFilter.GaussianBlur(radius=30))
+      im_neg_blur = im_neg_thumb.resize(im.size, resample=Image.BILINEAR)
+      if debug: im_neg_blur.show()
+
+      if debug: print >>sys.stderr, "ImageOps.equalize(im) done"
+      im = Image.blend(im, im_neg_blur, self.filter_equal_light*0.5)
+      im = ImageOps.autocontrast(im, cutoff=0)	# linear expand histogram (an alternative to equalize)
+      if debug: im.show()
 
     def svg_pathstats(path_d):
       """ calculate statistics from an svg path:
@@ -176,12 +226,15 @@ class TraceCenterline(inkex.Effect):
     for i in range(num_attempts):
       threshold = int(256.*(1+i)/(num_attempts+1))
       lut = [ 255 for n in range(threshold) ] + [ 0 for n in range(threshold,256) ]
+      if debug: print >>sys.stderr, "attempt "+ str(i)
       bw = im.point(lut, mode='1')
+      if debug: print >>sys.stderr, "bw from lut done"
       cand = { 'threshold':threshold, 'img_width':bw.size[0], 'img_height':bw.size[1], 'mean': ImageStat.Stat(im).mean[0] }
       fp = tempfile.NamedTemporaryFile(suffix='.pbm', delete=False)
       fp.write("P4\n%d %d\n" % (bw.size[0], bw.size[1]))
       fp.write(bw.tobytes())
       fp.close()
+      if debug: print >>sys.stderr, "pbm from bw done"
       try:
         p = subprocess.Popen(autotrace_cmd + [fp.name], stdout=subprocess.PIPE)
       except Exception as e:
@@ -191,6 +244,8 @@ class TraceCenterline(inkex.Effect):
         sys.exit(1)
 
       cand['svg'] = p.communicate()[0]
+      if debug: print >>sys.stderr, "autotrace done"
+
       os.unlink(fp.name)
       # <?xml version="1.0" standalone="yes"?>\n<svg width="86" height="83">\n<path style="stroke:#000000; fill:none;" d="M36 15C37.9219 18.1496 41.7926 19.6686 43.2585 23.1042C47.9556 34.1128 39.524 32.0995 35.179 37.6034C32.6296 40.8328 34 48.1105 34 52M36 17C32.075 22.4565 31.8375 30.074 35 36M74 42L46 38C45.9991 46.1415 46.7299 56.0825 45.6319 64C44.1349 74.7955 23.7094 77.5566 16.044 72.3966C7.27363 66.4928 8.04426 45.0047 16.2276 38.7384C20.6362 35.3626 27.7809 36.0006 33 36M44 37L45 37"/>\n</svg>
       xml = inkex.etree.fromstring(cand['svg'])
@@ -207,7 +262,7 @@ class TraceCenterline(inkex.Effect):
       if cand['mean'] > 127:
         cand['mean'] = 255 - cand['mean']	# should not happen
       blackpixels = cand['img_width'] * cand['img_height'] * cand['mean'] / 255.
-      cand['strokewidth'] = blackpixels / cand['length']
+      cand['strokewidth'] = blackpixels / max(cand['length'],1.0)
       candidate[i] = cand
 
     def calc_weight(cand, idx):
@@ -246,6 +301,11 @@ class TraceCenterline(inkex.Effect):
     if self.options.version:
       print __version__
       sys.exit(0)
+    if self.options.megapixels  is not None: self.megapixel_limit    = self.options.megapixels
+    if self.options.candidates  is not None: self.candidates         = self.options.candidates
+    if self.options.invert      is not None: self.invert_image       = self.options.invert
+    if self.options.despecle    is not None: self.filter_median      = self.options.despecle
+    if self.options.equal_light is not None: self.filter_equal_light = self.options.equal_light
 
     self.calc_unit_factor()
 
@@ -313,6 +373,7 @@ class TraceCenterline(inkex.Effect):
       #
       # Create SVG Path
       style = { 'stroke': '#000000', 'fill': 'none', 'stroke-linecap': 'round', 'stroke-width': stroke_width }
+      if self.invert_image: style['stroke'] = '#777777'
       path_attr = { 'style': simplestyle.formatStyle(style), 'd': path_d, 'transform': matrix }
       ## insert the new path object
       inkex.etree.SubElement(self.current_layer, inkex.addNS('path', 'svg'), path_attr)

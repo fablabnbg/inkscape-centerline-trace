@@ -6,12 +6,21 @@
   <dependency type="executable" location="extensions">inkex.py</dependency>
   <dependency type="executable" location="extensions">centerline-trace.py</dependency>
 
+  <param name="invert" type="boolean" _gui-text="Trace bright lines. Default: dark lines.">false</param>
+  <param name="megapixels" type="float" min="0.1" max="99.9" precision="1" _gui-text="Limit image size in megapixels (Default: 2.0; lower is faster).">2.0</param>
+  <param name="candidates" type="int" min="1" max="255" _gui-text="[1..255] Autotrace candidate runs. Use 1 with noisy photos. (Default: 1; lower is much faster)">1</param>
+  <param name="filters" type="description">
+
+  Preprocessing filters:
+  </param>
+  <param name="equal-light" type="float" min="0.0" max="1.9" precision="1" _gui-text="Equalize illumination. Use 1.0 with flash photography, use 0.0 to disable. (Default: 0.0)">0.0</param>
+  <param name="despecle" type="int" min="0" max="9" _gui-text="Apply a median filter. 0: no filter, 5: for strong noise reduction. (Default: 0)">0</param>
   <!-- Keep in sync with chain_paths.py line 16 __version__ = ... -->
   <param name="about_version" type="description">
   
   
   https://github.com/fablabnbg/inkscape-centerline-trace
-  Version 0.2</param>
+  Version 0.3</param>
 
   <effect needs-live-preview="false" >
     <object-type>path</object-type>

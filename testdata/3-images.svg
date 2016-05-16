@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="210mm"
+   height="297mm"
+   viewBox="0 0 210 297"
+   version="1.1"
+   id="svg8"
+   inkscape:version="0.91+devel r"
+   sodipodi:docname="3-images.svg">
+  <defs
+     id="defs2" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.61557941"
+     inkscape:cx="396.85039"
+     inkscape:cy="561.25984"
+     inkscape:document-units="mm"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="1600"
+     inkscape:window-height="848"
+     inkscape:window-x="0"
+     inkscape:window-y="1080"
+     inkscape:window-maximized="1" />
+  <metadata
+     id="metadata5">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Ebene 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <image
+       sodipodi:absref="/home/jw/src/github/fablabnbg/inkscape-centerline-trace/testdata/muggeley.jpg"
+       xlink:href="muggeley.jpg"
+       style="stroke-width:2.6152637"
+       width="139.2084"
+       height="78.372177"
+       preserveAspectRatio="none"
+       id="image4421"
+       x="9.7982759"
+       y="4.9358096" />
+    <image
+       sodipodi:absref="/home/jw/src/github/fablabnbg/inkscape-centerline-trace/testdata/dolly.png"
+       xlink:href="dolly.png"
+       width="112.53612"
+       height="97.719444"
+       preserveAspectRatio="none"
+       id="image4486"
+       x="21.957706"
+       y="90.82914" />
+    <image
+       sodipodi:absref="/home/jw/src/github/fablabnbg/inkscape-centerline-trace/testdata/kringel.png"
+       xlink:href="kringel.png"
+       style="stroke-width:0.38679612"
+       width="78.436386"
+       height="75.700241"
+       preserveAspectRatio="none"
+       id="image4551"
+       x="46.293644"
+       y="208.00226" />
+  </g>
+</svg>
