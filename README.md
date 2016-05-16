@@ -18,14 +18,16 @@ Works great with testdata, to be integrated into inkscape.
 
 
 Algorithm:
-The input image is converted to a graymap and histogram normalized with PIL.ImageOps.equalize.
+The input image is converted to a graymap and histogram normalized with PIL.ImageOps.autocontrast.
+Optional preprocessing: equal illumination, median denoise filter.
 
 Autotrace needs a bi-level bitmap. In order to find the
-best threshold value, we run autotrace at multiple thresholds
-and evaluate the results.
+best threshold value, we can run autotrace at multiple thresholds
+and evaluate the result candidates.
 
 We count the number of line segments produced and 
 measure the total path length drawn.
 The svg that has the longest path but the least number of
 segments is returned.
 
+<a href="https://raw.githubusercontent.com/fablabnbg/inkscape-centerline-trace/master/testdata/3-images.svg"><img src="https://raw.githubusercontent.com/fablabnbg/inkscape-centerline-trace/master/centerline-trace-3-images-done.png" /></a>
