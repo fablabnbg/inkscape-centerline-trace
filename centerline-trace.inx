@@ -6,7 +6,8 @@
   <dependency type="executable" location="extensions">inkex.py</dependency>
   <dependency type="executable" location="extensions">centerline-trace.py</dependency>
 
-  <param name="invert" type="boolean" _gui-text="Trace bright lines. Default: dark lines.">false</param>
+  <param name="remove" type="boolean" _gui-text="Replace image with vector graphics. (Default: Place on top)">false</param>
+  <param name="invert" type="boolean" _gui-text="Trace bright lines. (Default: dark lines)">false</param>
   <param name="megapixels" type="float" min="0.1" max="99.9" precision="1" _gui-text="Limit image size in megapixels (Default: 2.0; lower is faster).">2.0</param>
   <param name="candidates" type="int" min="1" max="255" _gui-text="[1..255] Autotrace candidate runs. Use 1 with noisy photos. (Default: 1; lower is much faster)">1</param>
   <param name="filters" type="description">
@@ -18,9 +19,9 @@
   <!-- Keep in sync with chain_paths.py line 16 __version__ = ... -->
   <param name="about_version" type="description">
   
-  
+  Please report praise or strange results with the issue tracker at
   https://github.com/fablabnbg/inkscape-centerline-trace
-  Version 0.3</param>
+  Version 0.4</param>
 
   <effect needs-live-preview="false" >
     <object-type>path</object-type>

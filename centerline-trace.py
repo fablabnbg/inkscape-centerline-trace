@@ -43,9 +43,10 @@
 # 2016-05-10 jw, V0.1 -- initial draught
 # 2016-05-11 jw, V0.2 -- first usable inkscape-extension
 # 2016-05-15 jw, V0.3 -- equal spatial illumination applied. autocontrast instead of equalize. denoise.
+# 2016-05-16 jw, V0.4 -- added replace option. Made filters optional.
 #
 
-__version__ = '0.3'	# Keep in sync with chain_paths.inx ca line 22
+__version__ = '0.4'	# Keep in sync with chain_paths.inx ca line 22
 __author__ = 'Juergen Weigert <juewei@fabmail.org>'
 
 import sys, os, re, math, tempfile, subprocess, base64
@@ -99,6 +100,7 @@ class TraceCenterline(inkex.Effect):
     self.autotrace_opts=[]		 # extra options for autotrace tuning.
     self.megapixel_limit = 2.0		 # max image size (limit needed, as we have no progress indicator)
     self.invert_image = False		 # True: trace bright lines.
+    self.replace_image = False		 # True: remove image object when adding path object.
     self.candidates = 15		 # [1..255] Number of autotrace candidate runs.
     self.filter_median = 0		 # 0 to disable median filter.
     self.filter_equal_light = 0.0        # [0.0 .. 1.9] Use 1.0 with photos. Use 0.0 with perfect scans.
@@ -116,6 +118,7 @@ class TraceCenterline(inkex.Effect):
           action = 'store_const', const=True, dest='version', default=False,
           help='Just print version number ("'+__version__+'") and exit.')
     self.OptionParser.add_option('-i', '--invert', action='store', type='inkbool', default=False, help='Trace bright lines. (Default: dark lines)')
+    self.OptionParser.add_option('-r', '--remove', action='store', type='inkbool', default=False, help='Replace image with vector graphics. (Default: Place on top)')
     self.OptionParser.add_option('-m', '--megapixels', action='store',
           type='float', default=2.0, help="Limit image size in megapixels. (Lower is faster)")
     self.OptionParser.add_option('-e', '--equal-light', action='store',
@@ -301,9 +304,10 @@ class TraceCenterline(inkex.Effect):
     if self.options.version:
       print __version__
       sys.exit(0)
+    if self.options.invert      is not None: self.invert_image       = self.options.invert
+    if self.options.remove      is not None: self.replace_image      = self.options.remove
     if self.options.megapixels  is not None: self.megapixel_limit    = self.options.megapixels
     if self.options.candidates  is not None: self.candidates         = self.options.candidates
-    if self.options.invert      is not None: self.invert_image       = self.options.invert
     if self.options.despecle    is not None: self.filter_median      = self.options.despecle
     if self.options.equal_light is not None: self.filter_equal_light = self.options.equal_light
 
@@ -377,6 +381,8 @@ class TraceCenterline(inkex.Effect):
       path_attr = { 'style': simplestyle.formatStyle(style), 'd': path_d, 'transform': matrix }
       ## insert the new path object
       inkex.etree.SubElement(self.current_layer, inkex.addNS('path', 'svg'), path_attr)
+      ## delete the old image object
+      if self.replace_image: node.getparent().remove(node)
 
 
 

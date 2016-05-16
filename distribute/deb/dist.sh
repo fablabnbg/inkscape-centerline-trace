@@ -4,12 +4,13 @@
 name=$1
 vers=$2
 url=http://github.com/fablabnbg/inkscape-centerline-trace
-requires="autotrace, python3-PIL | bash, python-PIL"
+requires="autotrace, python3-pil | bash, python-pil"
 
 tmp=../out
 
 [ -d $tmp ] && rm -rf $tmp/*.deb
 mkdir $tmp
+cp description-pak files
 cd files
 fakeroot checkinstall --fstrans --reset-uid --type debian \
   --install=no -y --pkgname $name --pkgversion $vers --arch all \
