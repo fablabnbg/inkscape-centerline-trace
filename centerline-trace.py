@@ -253,8 +253,8 @@ class TraceCenterline(inkex.Effect):
       fp.write(bw.tobytes())
       fp.close()
       if debug: print >>sys.stderr, "pbm from bw done"
-      try:
-        p = subprocess.Popen(autotrace_cmd + [fp.name], stdout=subprocess.PIPE)
+      # try:
+      p = subprocess.Popen(autotrace_cmd + [fp.name], stdout=subprocess.PIPE)
       
       # the following crashes Inkscape (!) when used with GUI and autotrace not installed
       #except Exception as e:
