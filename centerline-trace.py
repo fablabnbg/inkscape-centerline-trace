@@ -124,9 +124,9 @@ class TraceCenterline(inkex.Effect):
       self.tty = open("/dev/tty", 'w')
     except:
       try:
-        self.tty = open("CON:", 'w')	# windows. Does this work???
-      except:
         self.tty = open(os.devnull, 'w')  # '/dev/null' for POSIX, 'nul' for Windows.
+      except:
+        self.tty = open("CON:", 'w')	# windows. Does this work???
     if debug: print >>self.tty, "__init__"
 
     self.OptionParser.add_option('-V', '--version',
