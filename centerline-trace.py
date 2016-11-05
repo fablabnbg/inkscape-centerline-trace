@@ -78,7 +78,11 @@ else:   				# linux
 import inkex, simplestyle
 import cubicsuperpath
 
-inkex.localize()
+try:
+  # only since inkscape 0.91
+  inkex.localize()
+except:
+  pass
 
 from optparse import SUPPRESS_HELP
 
