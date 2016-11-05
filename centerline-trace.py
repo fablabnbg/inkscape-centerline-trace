@@ -105,6 +105,21 @@ class TraceCenterline(inkex.Effect):
     self.filter_median = 0		 # 0 to disable median filter.
     self.filter_equal_light = 0.0        # [0.0 .. 1.9] Use 1.0 with photos. Use 0.0 with perfect scans.
 
+    # Test if autotrace is installed and in path
+    command = "autotrace --version"
+            
+    p = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    return_code = p.wait()
+    f = p.stdout
+    err = p.stderr
+            
+    out = p.communicate()[0]
+            
+    found = out.find('AutoTrace')
+    if found == -1:
+        print >>sys.stderr, "You need to install autotrace for this extension to work! (Windows/OS X: see https://sourceforge.net/projects/autotrace/, Debian/Ubuntu: apt-get install autotrace.)"
+        exit()
+
     try:
       self.tty = open("/dev/tty", 'w')
     except:
@@ -238,13 +253,15 @@ class TraceCenterline(inkex.Effect):
       fp.write(bw.tobytes())
       fp.close()
       if debug: print >>sys.stderr, "pbm from bw done"
-      try:
-        p = subprocess.Popen(autotrace_cmd + [fp.name], stdout=subprocess.PIPE)
-      except Exception as e:
-        print '+ '+' '.join(autotrace_cmd)
-        print e
-        print "Try:\n  sudo apt-get install autotrace"
-        sys.exit(1)
+      # try:
+      p = subprocess.Popen(autotrace_cmd + [fp.name], stdout=subprocess.PIPE)
+      
+      # the following crashes Inkscape (!) when used with GUI and autotrace not installed
+      #except Exception as e:
+        #print '+ '+' '.join(autotrace_cmd)
+        #print e
+        #print "Try:\n  sudo apt-get install autotrace"
+        #sys.exit(1)
 
       cand['svg'] = p.communicate()[0]
       if debug: print >>sys.stderr, "autotrace done"
@@ -359,9 +376,11 @@ class TraceCenterline(inkex.Effect):
       path_svg,stroke_width,im_size = self.svg_centerline_trace(filename)
       xml = inkex.etree.fromstring(path_svg)
       path_d=xml.find('path').attrib['d']
-
-      x_off = float(node.get('x'))
-      y_off = float(node.get('y'))
+      
+      # images can also just have a transform attribute, and no x or y, 
+      # could be replaced by a (slower) call to command line, or by computeBBox from simpletransform
+      x_off = float(node.get('x', 0))
+      y_off = float(node.get('y', 0))
       sx = float(node.get('width'))/im_size[0]
       sy = float(node.get('height'))/im_size[1]
       if debug: print >>self.tty, "im_width ", node.get('width'), "sx=",sx
@@ -373,7 +392,7 @@ class TraceCenterline(inkex.Effect):
       matrix = "translate(%g,%g) scale(%g,%g)" % (x_off, y_off, sx, sy)
       #
       if href[:5] == 'data:':
-        os.unlink(filename) 		## it was a temporary file (representing an embedded image).
+        os.unlink(filename) ## it was a temporary file (representing an embedded image).
       #
       # Create SVG Path
       style = { 'stroke': '#000000', 'fill': 'none', 'stroke-linecap': 'round', 'stroke-width': stroke_width }
