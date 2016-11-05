@@ -44,9 +44,10 @@
 # 2016-05-11 jw, V0.2 -- first usable inkscape-extension
 # 2016-05-15 jw, V0.3 -- equal spatial illumination applied. autocontrast instead of equalize. denoise.
 # 2016-05-16 jw, V0.4 -- added replace option. Made filters optional.
-#
+# 2016-11-05 jw, V0.5 -- support embedded jpeg (and possibly other file types)
+#			 https://github.com/fablabnbg/inkscape-centerline-trace/issues/8
 
-__version__ = '0.4'	# Keep in sync with chain_paths.inx ca line 22
+__version__ = '0.5'	# Keep in sync with centerline-trace.inx ca line 22
 __author__ = 'Juergen Weigert <juewei@fabmail.org>'
 
 import sys, os, re, math, tempfile, subprocess, base64
@@ -365,11 +366,13 @@ class TraceCenterline(inkex.Effect):
       elif href[0] == '/' or href[0] == '.':
         filename=href
         if debug: print >>self.tty, "linked image path: ="+filename
-      elif href[:15] == 'data:image/png;':
-        if debug: print >>self.tty, "embedded image: "+href[:15+7]
-        png=base64.decodestring(href[15+7:])
-	f=tempfile.NamedTemporaryFile(mode="wb", suffix=".png", delete=False)
-	f.write(png)
+      elif href[:11] == 'data:image/':
+        l = href[11:].index(';')
+	type = href[11:11+l]			# 'png' 'jpeg'
+        if debug: print >>self.tty, "embedded image: "+href[:11+l]
+        img=base64.decodestring(href[11+l+8:])
+	f=tempfile.NamedTemporaryFile(mode="wb", suffix="."+type, delete=False)
+	f.write(img)
 	filename=f.name
 	f.close()
       else:
