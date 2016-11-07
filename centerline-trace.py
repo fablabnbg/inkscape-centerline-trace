@@ -174,10 +174,13 @@ class TraceCenterline(inkex.Effect):
     if debug: print >>sys.stderr, "svg_centerline_trace start "+image_file
     im = Image.open(image_file)
     if 'A' in im.mode:
-      # this image has alpha. Paste it onto white.
+      # this image has alpha. Paste it onto white or black.
       im = im.convert("RGBA")
-      white = Image.new('RGBA', im.size, (255,255,255,255))
-      im = Image.alpha_composite(white, im)
+      if self.invert_image:
+        bg = Image.new('RGBA', im.size, (0,0,0,255)) # black background
+      else:  
+        bg = Image.new('RGBA', im.size, (255,255,255,255)) # white background
+      im = Image.alpha_composite(bg, im)
 
     im = im.convert(mode='L', dither=None)
     if debug: print >>sys.stderr, "seen: " + str([im.format, im.size, im.mode])
@@ -390,7 +393,11 @@ class TraceCenterline(inkex.Effect):
       #
       path_svg,stroke_width,im_size = self.svg_centerline_trace(filename)
       xml = inkex.etree.fromstring(path_svg)
-      path_d=xml.find('path').attrib['d']
+      try:
+        path_d=xml.find('path').attrib['d']
+      except: 
+        inkex.errormsg(_("Couldn't trace the path. Please make sure that the checkbox for tracing bright lines is set correctly and that your drawing has enough contrast."))
+        sys.exit(1)
       
       # images can also just have a transform attribute, and no x or y, 
       # could be replaced by a (slower) call to command line, or by computeBBox from simpletransform

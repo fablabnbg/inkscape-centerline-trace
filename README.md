@@ -11,16 +11,6 @@ See centerline-tracing.svg for an illustration of the idea.
 
 In inkscape it shows up under Extensions -> Images -> Centerline Trace ...
 
-Hints
-=====
-Autotrace works best if the image does not contain transparency.
-
-It will currently not work with embedded jpg images, so either use a png image, or create a png image from the jpg by making a Bitmap Copy (Edit -> Create Bitmap Copy) of the image.
-
-<p>
-<br>
-<p>
-
 <a href="https://raw.githubusercontent.com/fablabnbg/inkscape-centerline-trace/master/centerline-trace-poster.svg"><img src="https://raw.githubusercontent.com/fablabnbg/inkscape-centerline-trace/master/centerline-trace-poster.png" /></a>
 
 
