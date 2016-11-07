@@ -179,7 +179,7 @@ class TraceCenterline(inkex.Effect):
       if self.invert_image:
         bg = Image.new('RGBA', im.size, (0,0,0,255)) # black background
       else:  
-	bg = Image.new('RGBA', im.size, (255,255,255,255)) # white background
+        bg = Image.new('RGBA', im.size, (255,255,255,255)) # white background
       im = Image.alpha_composite(bg, im)
 
     im = im.convert(mode='L', dither=None)
