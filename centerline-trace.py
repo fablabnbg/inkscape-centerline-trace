@@ -393,7 +393,11 @@ class TraceCenterline(inkex.Effect):
       #
       path_svg,stroke_width,im_size = self.svg_centerline_trace(filename)
       xml = inkex.etree.fromstring(path_svg)
-      path_d=xml.find('path').attrib['d']
+      try:
+        path_d=xml.find('path').attrib['d']
+      except: 
+        inkex.errormsg(_("Couldn't trace the path. Please make sure that the checkbox for tracing bright lines is set correctly and that your drawing has enough contrast."))
+        sys.exit(1)
       
       # images can also just have a transform attribute, and no x or y, 
       # could be replaced by a (slower) call to command line, or by computeBBox from simpletransform
