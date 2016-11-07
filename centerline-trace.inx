@@ -21,7 +21,7 @@
   https://github.com/fablabnbg/inkscape-centerline-trace
   </param>
   <!-- Keep in sync with centerline_trace.py line 16 __version__ = ... -->
-  <param name="about_version" type="description">Version 0.5</param>
+  <param name="about_version" type="description">Version 0.6</param>
 
   <effect needs-live-preview="false" >
     <object-type>path</object-type>

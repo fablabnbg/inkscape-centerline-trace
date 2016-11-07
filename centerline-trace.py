@@ -46,8 +46,10 @@
 # 2016-05-16 jw, V0.4 -- added replace option. Made filters optional.
 # 2016-11-05 jw, V0.5 -- support embedded jpeg (and possibly other file types)
 #			 https://github.com/fablabnbg/inkscape-centerline-trace/issues/8
+# 2016-11-06 jw, V0.6 -- support transparent PNG images by applying white background
+#			 https://github.com/fablabnbg/inkscape-centerline-trace/issues/3
 
-__version__ = '0.5'	# Keep in sync with centerline-trace.inx ca line 22
+__version__ = '0.6'	# Keep in sync with centerline-trace.inx ca line 22
 __author__ = 'Juergen Weigert <juewei@fabmail.org>'
 
 import sys, os, re, math, tempfile, subprocess, base64
@@ -171,6 +173,12 @@ class TraceCenterline(inkex.Effect):
 
     if debug: print >>sys.stderr, "svg_centerline_trace start "+image_file
     im = Image.open(image_file)
+    if 'A' in im.mode:
+      # this image has alpha. Paste it onto white.
+      im = im.convert("RGBA")
+      white = Image.new('RGBA', im.size, (255,255,255,255))
+      im = Image.alpha_composite(white, im)
+
     im = im.convert(mode='L', dither=None)
     if debug: print >>sys.stderr, "seen: " + str([im.format, im.size, im.mode])
     scale_limit = math.sqrt(im.size[0] * im.size[1] * 0.000001 / self.megapixel_limit)
