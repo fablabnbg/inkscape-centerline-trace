@@ -174,10 +174,13 @@ class TraceCenterline(inkex.Effect):
     if debug: print >>sys.stderr, "svg_centerline_trace start "+image_file
     im = Image.open(image_file)
     if 'A' in im.mode:
-      # this image has alpha. Paste it onto white.
+      # this image has alpha. Paste it onto white or black.
       im = im.convert("RGBA")
-      white = Image.new('RGBA', im.size, (255,255,255,255))
-      im = Image.alpha_composite(white, im)
+      if self.invert_image:
+        bg = Image.new('RGBA', im.size, (0,0,0,255)) # black background
+      else:  
+	bg = Image.new('RGBA', im.size, (255,255,255,255)) # white background
+      im = Image.alpha_composite(bg, im)
 
     im = im.convert(mode='L', dither=None)
     if debug: print >>sys.stderr, "seen: " + str([im.format, im.size, im.mode])
