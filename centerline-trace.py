@@ -48,8 +48,9 @@
 #			 https://github.com/fablabnbg/inkscape-centerline-trace/issues/8
 # 2016-11-06 jw, V0.6 -- support transparent PNG images by applying white background
 #			 https://github.com/fablabnbg/inkscape-centerline-trace/issues/3
+# 2016-11-07 jw, V0.7 -- transparency: use black background when the '[x] trace white line' is enabled.
 
-__version__ = '0.6'	# Keep in sync with centerline-trace.inx ca line 22
+__version__ = '0.7'	# Keep in sync with centerline-trace.inx ca line 22
 __author__ = 'Juergen Weigert <juewei@fabmail.org>'
 
 import sys, os, re, math, tempfile, subprocess, base64
