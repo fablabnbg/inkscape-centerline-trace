@@ -6,6 +6,9 @@
 # http://docs.opencv.org/modules/core/doc/drawing_functions.html
 # http://docs.opencv.org/modules/core/doc/operations_on_arrays.html?highlight=avg#mean
 #
+# http://docs.opencv.org/3.0-beta/modules/imgproc/doc/feature_detection.html?highlight=houghlines#cv2.HoughLines
+# http://docs.opencv.org/3.0-beta/doc/py_tutorials/py_imgproc/py_histograms/py_histogram_equalization/py_histogram_equalization.html?highlight=contrast#clahe-contrast-limited-adaptive-histogram-equalization
+#
 import os
 import cv
 
@@ -176,7 +179,11 @@ while (True):
 
   gray = cv.CreateImage( (img.width, img.height), cv.IPL_DEPTH_8U, 1 );
   cv.CvtColor(img, gray, cv.CV_BGR2GRAY)
-  cv.Canny(gray, gray, 50, gui['thresh'], 3)	# Canny edge detector does double lines.
+  # cv.Canny(gray, gray, 50, gui['thresh'], 3)	# Canny edge detector does double lines.
+  # How about CLAHE ?
+  cv.EqualizeHist(gray, gray)
+  cv.Threshold(gray, gray, gui['thresh'], 255, cv.CV_THRESH_BINARY)
+
   img = gray	# FIXME: expand to RGB again, so that we can draw a colorful GUI
   draw_gui(cv, img)
 
