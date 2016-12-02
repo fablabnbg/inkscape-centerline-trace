@@ -5,6 +5,7 @@
 # (c) 2016, juewei@fabmail.com
 
 opts='--invert=False'
+opts='--invert=False --candidates=1 --debug'
 # opts='--candidates=15'
 # opts='--megapixels=2.0'
 # opts='--megapixel=0.5 --invert=True --candidates=5'

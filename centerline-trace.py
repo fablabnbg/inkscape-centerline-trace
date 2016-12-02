@@ -53,7 +53,7 @@
 __version__ = '0.7'	# Keep in sync with centerline-trace.inx ca line 22
 __author__ = 'Juergen Weigert <juewei@fabmail.org>'
 
-import sys, os, re, math, tempfile, subprocess, base64
+import sys, os, re, math, tempfile, subprocess, base64, time
 
 try:
   from PIL import Image
@@ -150,6 +150,7 @@ class TraceCenterline(inkex.Effect):
           type='int', default=15, help="[1..255] Autotrace candidate runs. (Lower is much faster)")
     self.OptionParser.add_option('-d', '--despecle', action='store',
           type='int', default=0, help="[0..9] Apply median filter for noise reduction. (Default 0, off)")
+    self.OptionParser.add_option('-D', '--debug', action='store_const', const=True, default=False, dest='debug', help='Switch on debugging, shows processed pictures.')
 
   def version(self):
     return __version__
@@ -257,13 +258,15 @@ class TraceCenterline(inkex.Effect):
     # ...
 
     candidate = {}
+    if debug: im.show()
 
     for i in range(num_attempts):
       threshold = int(256.*(1+i)/(num_attempts+1))
       lut = [ 255 for n in range(threshold) ] + [ 0 for n in range(threshold,256) ]
       if debug: print >>sys.stderr, "attempt "+ str(i)
       bw = im.point(lut, mode='1')
-      if debug: print >>sys.stderr, "bw from lut done"
+      if debug: print >>sys.stderr, "bw from lut done: threshold=%d" % threshold
+      if debug: bw.show(command="/usr/bin/display -title=bw:threshold=%d" % threshold)
       cand = { 'threshold':threshold, 'img_width':bw.size[0], 'img_height':bw.size[1], 'mean': ImageStat.Stat(im).mean[0] }
       fp = tempfile.NamedTemporaryFile(suffix='.pbm', delete=False)
       fp.write("P4\n%d %d\n" % (bw.size[0], bw.size[1]))
@@ -335,6 +338,8 @@ class TraceCenterline(inkex.Effect):
         return self.unit_factor
 
   def effect(self):
+    global debug
+
     if self.options.version:
       print __version__
       sys.exit(0)
@@ -344,6 +349,7 @@ class TraceCenterline(inkex.Effect):
     if self.options.candidates  is not None: self.candidates         = self.options.candidates
     if self.options.despecle    is not None: self.filter_median      = self.options.despecle
     if self.options.equal_light is not None: self.filter_equal_light = self.options.equal_light
+    if self.options.debug       is not None: debug                   = self.options.debug
 
     self.calc_unit_factor()
 

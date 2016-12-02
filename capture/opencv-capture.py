@@ -1,6 +1,7 @@
 #! /usr/bin/python
 #
 # for cv2, cv3 see also http://stackoverflow.com/questions/18458422/query-maximum-resolution-in-opencv
+# http://stackoverflow.com/questions/7322939/how-to-count-cameras-in-opencv-2-3
 #
 import os
 import cv
@@ -42,11 +43,22 @@ if not cap:
   print "Error opening WebCAM"
   sys.exit(1)
 
+state=0
 while 1:
   frame = cv.QueryFrame(cap)
   if frame is None:
     break
   cv.ShowImage('Camera Image', frame)
-  if 0xFF & cv.WaitKey(1) in (27,ord('q'),ord('Q'),):
+  key = 0xFF & cv.WaitKey(1)
+  if key in ( 27, ord('q'), ord('Q'), ):
     break
-
+  if key in ( ord(' '), ord('w'), ord('W'), ord('S'), ord('s'), ):
+    state = 1
+  if state == 1:
+    # convert to grayscale
+    cv.SaveImage('pic.png', frame)
+    print("saving pic.png")
+    state = 2
+  elif state == 2:
+    # fork autotrace
+    pass
