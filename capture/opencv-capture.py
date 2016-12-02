@@ -65,7 +65,7 @@ if not cap:
   print "Error opening WebCAM"
   sys.exit(1)
 
-gui = { 'prop': {}, 'step': 8, 'nav': 'm' }
+gui = { 'prop': {}, 'step': 8, 'nav': 'm', 'thresh':128 }
 
 idx = 0
 for p in prop:
@@ -82,6 +82,11 @@ for p in prop:
   if prop[p][1]:
     print "property %s = '%s'" % (p, prop[p][2])
 gui['prop'] = prop;
+
+cv.NamedWindow('camera')
+
+def set_thresh(t): gui['thresh'] = t
+cv.CreateTrackbar("threshold", 'camera', gui['thresh'], 255, set_thresh)
 
 def draw_gui(cv, img):
   if not 'w' in gui: gui['w'] = img.width
@@ -171,11 +176,11 @@ while (True):
 
   gray = cv.CreateImage( (img.width, img.height), cv.IPL_DEPTH_8U, 1 );
   cv.CvtColor(img, gray, cv.CV_BGR2GRAY)
-  # cv.Canny(gray, gray, 50, 150, 3)	# Canny edge detector does double lines.
+  cv.Canny(gray, gray, 50, gui['thresh'], 3)	# Canny edge detector does double lines.
   img = gray	# FIXME: expand to RGB again, so that we can draw a colorful GUI
   draw_gui(cv, img)
 
-  cv.ShowImage('Camera Image', img)
+  cv.ShowImage('camera', img)
   key_raw = cv.WaitKey(1)
   key = key_raw & 0xff    # force into ascii range
 
