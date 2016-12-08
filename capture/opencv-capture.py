@@ -181,10 +181,10 @@ while (True):
   cv.CvtColor(img, gray, cv.CV_BGR2GRAY)
   # cv.Canny(gray, gray, 50, gui['thresh'], 3)	# Canny edge detector does double lines.
   # How about CLAHE ?
-  cv.EqualizeHist(gray, gray)
-  cv.Threshold(gray, gray, gui['thresh'], 255, cv.CV_THRESH_BINARY)
+  # cv.EqualizeHist(gray, gray)
+  # cv.Threshold(gray, gray, gui['thresh'], 255, cv.CV_THRESH_BINARY)
 
-  img = gray	# FIXME: expand to RGB again, so that we can draw a colorful GUI
+  # img = gray	# FIXME: expand to RGB again, so that we can draw a colorful GUI
   draw_gui(cv, img)
 
   cv.ShowImage('camera', img)

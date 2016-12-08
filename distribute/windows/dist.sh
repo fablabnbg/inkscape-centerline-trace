@@ -1,5 +1,7 @@
 #! /bin/bash
+#
 # Make a windows distribution
+#
 
 name=$1
 vers=$2

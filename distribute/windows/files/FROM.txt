@@ -1,0 +1,4 @@
+https://github.com/fablabnbg/inkscape-centerline-trace/issues/5#issuecomment-265520576
+autotrace.exe	https://github.com/scottvr/autotrace-win64-binaries
+get-pip.py 	https://pip.pypa.io/en/stable/installing
+get-pip.py 	https://bootstrap.pypa.io/get-pip.py
