@@ -49,6 +49,7 @@
 # 2016-11-06 jw, V0.6 -- support transparent PNG images by applying white background
 #			 https://github.com/fablabnbg/inkscape-centerline-trace/issues/3
 # 2016-11-07 jw, V0.7 -- transparency: use black background when the '[x] trace white line' is enabled.
+# 2017-03-05 jw,      -- instructions for mac added: http://macappstore.org/autotrace/
 
 __version__ = '0.7'	# Keep in sync with centerline-trace.inx ca line 22
 __author__ = 'Juergen Weigert <juewei@fabmail.org>'
@@ -125,7 +126,7 @@ class TraceCenterline(inkex.Effect):
             
     found = out.find('AutoTrace')
     if found == -1:
-        print >>sys.stderr, "You need to install autotrace for this extension to work! (Windows/OS X: see https://sourceforge.net/projects/autotrace/, Debian/Ubuntu: apt-get install autotrace.)"
+        print >>sys.stderr, "You need to install autotrace for this extension to work! (macOS: http://macappstore.org/autotrace/ , Windows: see https://sourceforge.net/projects/autotrace/, Debian/Ubuntu: apt-get install autotrace.)"
         exit()
 
     try:
