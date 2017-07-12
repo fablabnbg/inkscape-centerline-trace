@@ -13,8 +13,14 @@ In inkscape it shows up under Extensions -> Images -> Centerline Trace ...
 
 <a href="https://raw.githubusercontent.com/fablabnbg/inkscape-centerline-trace/master/centerline-trace-poster.svg"><img src="https://raw.githubusercontent.com/fablabnbg/inkscape-centerline-trace/master/centerline-trace-poster.png" /></a>
 
+Installation hints
+------------------
+* Windows:  https://inkscape.org/en/gallery/item/10567/centerline_NIH0Rhk.pdf
+* MacOS: http://macappstore.org/autotrace/
 
-Algorithm:
+
+Algorithm
+---------
 The input image is converted to a graymap and histogram normalized with PIL.ImageOps.autocontrast.
 Optional preprocessing: equal illumination, median denoise filter.
 

@@ -50,8 +50,9 @@
 #			 https://github.com/fablabnbg/inkscape-centerline-trace/issues/3
 # 2016-11-07 jw, V0.7 -- transparency: use black background when the '[x] trace white line' is enabled.
 # 2017-03-05 jw,      -- instructions for mac added: http://macappstore.org/autotrace/
+# 2017-07-12 jw,      -- instructions for windows added: https://inkscape.org/en/gallery/item/10567/centerline_NIH0Rhk.pdf
 
-__version__ = '0.7'	# Keep in sync with centerline-trace.inx ca line 22
+__version__ = '0.7'	# Keep in sync with centerline-trace.inx ca. line 3 and 24
 __author__ = 'Juergen Weigert <juewei@fabmail.org>'
 
 import sys, os, re, math, tempfile, subprocess, base64, time

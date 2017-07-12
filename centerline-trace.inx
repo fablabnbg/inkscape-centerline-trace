@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <inkscape-extension xmlns="http://www.inkscape.org/namespace/inkscape/extension">
-  <_name>Centerline Trace</_name>
+  <_name>Centerline Trace 0.7</_name><!-- CAUTION: keep in sync with centerline_trace.py ca. line 55 __version__ = ... -->
   <id>com.github.fablabnbg.inskscape-centerline-trace</id>
   <dependency type="extension">org.inkscape.output.svg.inkscape</dependency>
   <dependency type="executable" location="extensions">inkex.py</dependency>
@@ -20,7 +20,7 @@
   For updates, praise or bug reports please refer to
   https://github.com/fablabnbg/inkscape-centerline-trace
   </param>
-  <!-- Keep in sync with centerline_trace.py line 16 __version__ = ... -->
+  <!-- CAUTION: Keep in sync with centerline_trace.py ca. line 55 __version__ = ... -->
   <param name="about_version" type="description">Version 0.7</param>
 
   <effect needs-live-preview="false" >
