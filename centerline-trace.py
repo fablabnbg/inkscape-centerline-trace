@@ -289,7 +289,13 @@ class TraceCenterline(inkex.Effect):
 
       os.unlink(fp.name)
       # <?xml version="1.0" standalone="yes"?>\n<svg width="86" height="83">\n<path style="stroke:#000000; fill:none;" d="M36 15C37.9219 18.1496 41.7926 19.6686 43.2585 23.1042C47.9556 34.1128 39.524 32.0995 35.179 37.6034C32.6296 40.8328 34 48.1105 34 52M36 17C32.075 22.4565 31.8375 30.074 35 36M74 42L46 38C45.9991 46.1415 46.7299 56.0825 45.6319 64C44.1349 74.7955 23.7094 77.5566 16.044 72.3966C7.27363 66.4928 8.04426 45.0047 16.2276 38.7384C20.6362 35.3626 27.7809 36.0006 33 36M44 37L45 37"/>\n</svg>
-      xml = inkex.etree.fromstring(cand['svg'])
+      try:
+        xml = inkex.etree.fromstring(cand['svg'])
+      except:
+        print >>sys.stderr, "autotrace_cmd: " + ' '.join(autotrace_cmd)
+        print >>sys.stderr, "ERROR: no proper xml returned: '" + cand['svg'] + "'"
+        xml = inkex.etree.fromstring('<svg/>'); # empty dummy
+
       p_len,p_seg,p_pts = 0,0,0
       for p in xml.findall('path'):
         pstat = svg_pathstats(p.attrib['d'])
