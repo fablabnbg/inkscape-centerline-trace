@@ -1,12 +1,15 @@
 ; Taken from http://nsis.sourceforge.net/Simple_installer_with_JRE_check by weebib
 ; Use it as you desire.
+; Inspired also by 
+; - http://git.videolan.org/?p=vlc.git;a=tree;f=extras/package/win32;hb=HEAD
+; - http://nsis.sourceforge.net/Category:Real_World_Installers
  
 ; Credit given to so many people of the NSIS forum.
  
-!define AppName "Inkscape Extension Chain Paths"
+!define AppName "Inkscape Extension Centerline Trace"
 !define AppVersion "VERSION"
-!define ShortName "chain-paths"
-!define Vendor "Fab Lab Region Nürnberg e.V."
+!define ShortName "centerline-trace"
+!define Vendor "Jürgen Weigert c/o Fab Lab Region Nürnberg e.V."
  
 !include "MUI.nsh"
 !include "Sections.nsh"
@@ -35,31 +38,6 @@ Var JREPath
  
 ;--------------------------------
 ;Pages
- 
-  ; License page
-  ; !insertmacro MUI_PAGE_LICENSE "${NSISDIR}\Contrib\Modern UI\License.txt"
-  ; This page checks for JRE. It displays a dialog based on JRE.ini if it needs to install JRE
-  ; Otherwise you won't see it.
-  Page custom CheckInstalledJRE
- 
-  ; Define headers for the 'Java installation successfully' page
-  !define MUI_INSTFILESPAGE_FINISHHEADER_TEXT "Java installation complete"
-  !define MUI_PAGE_HEADER_TEXT "Installing Java runtime"
-  !define MUI_PAGE_HEADER_SUBTEXT "Please wait while we install the Java runtime"
-  !define MUI_INSTFILESPAGE_FINISHHEADER_SUBTEXT "Java runtime installed successfully."
-  !insertmacro MUI_PAGE_INSTFILES
-  !define MUI_INSTFILESPAGE_FINISHHEADER_TEXT "Installation complete"
-  !define MUI_PAGE_HEADER_TEXT "Installing"
-  !define MUI_PAGE_HEADER_SUBTEXT "Please wait while ${AppName} is being installed."
-; Uncomment the next line if you want optional components to be selectable
-;  !insertmacro MUI_PAGE_COMPONENTS
-  !define MUI_PAGE_CUSTOMFUNCTION_PRE myPreInstfiles
-  !define MUI_PAGE_CUSTOMFUNCTION_LEAVE RestoreSections
-  !insertmacro MUI_PAGE_DIRECTORY
-  !insertmacro MUI_PAGE_INSTFILES
-  !insertmacro MUI_PAGE_FINISH
-  !insertmacro MUI_UNPAGE_CONFIRM
-  !insertmacro MUI_UNPAGE_INSTFILES
  
 ;--------------------------------
 ;Modern UI Configuration
