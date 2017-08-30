@@ -1,0 +1,16 @@
+http://www.kvec.de/english/index.htm
+ binary only?
+ http://www.kvec.de/kvec_win.zip
+ http://www.kvec.de/kvec_l.tgz
+ http://www.kvec.de/kvec_l64.tgz
+
+http://xmailserver.org/davide.html
+ -> http://xmailserver.org/ras2vec.zip
+
+autotracer.org
+  This tool uses the fantastic autotrace library developed by Martin Weber
+
+http://linetracer.sourceforge.net/
+  -> https://netcologne.dl.sourceforge.net/project/linetracer/linetracer/v0.2.1/LineTracer-v0.2.1.exe
+  -> svn checkout https://svn.code.sf.net/p/linetracer/code/trunk linetracer-code
+
