@@ -15,7 +15,13 @@ In inkscape it shows up under Extensions -> Images -> Centerline Trace ...
 
 Installation hints
 ------------------
-* Windows:  https://inkscape.org/en/gallery/item/10567/centerline_NIH0Rhk.pdf
+* Windows: 
+    * Instructions for Inkscape 0.92.2: 
+        * download the [zip file](https://github.com/fablabnbg/inkscape-centerline-trace/archive/master.zip) of [inkscape-centerline-trace](https://github.com/fablabnbg/inkscape-centerline-trace) and unpack it
+        * copy the files centerline-trace.inx, centerline-trace.py to your Inkscape User extensions folder (see Edit > Preferences > System: System info: User extensions)
+        * download the [autotrace binary](https://github.com/scottvr/autotrace-win64-binaries/raw/master/bin/autotrace.exe) from [autotrace-win64-binaries github repo](https://github.com/scottvr/autotrace-win64-binaries).
+        * copy the downloaded autotrace.exe to Inkscape's User extensions folder
+    * Instructions for Inkscape 0.92: https://inkscape.org/en/gallery/item/10567/centerline_NIH0Rhk.pdf
 * MacOS: http://macappstore.org/autotrace/
 
 
