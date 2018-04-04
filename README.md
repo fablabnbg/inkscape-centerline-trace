@@ -22,7 +22,7 @@ Installation hints
         * download the [autotrace binary](https://github.com/scottvr/autotrace-win64-binaries/raw/master/bin/autotrace.exe) from [autotrace-win64-binaries github repo](https://github.com/scottvr/autotrace-win64-binaries).
         * copy the downloaded autotrace.exe to Inkscape's User extensions folder
     * Instructions for Inkscape 0.92: https://inkscape.org/en/gallery/item/10567/centerline_NIH0Rhk.pdf
-* MacOS: http://macappstore.org/autotrace/
+* MacOS: (No longer available: http://macappstore.org/autotrace/) Please see https://github.com/fablabnbg/inkscape-centerline-trace/issues/13
 
 
 Algorithm
