@@ -51,9 +51,10 @@
 # 2016-11-07 jw, V0.7 -- transparency: use black background when the '[x] trace white line' is enabled.
 # 2017-03-05 jw,      -- instructions for mac added: http://macappstore.org/autotrace/
 # 2017-07-12 jw,      -- instructions for windows added: https://inkscape.org/en/gallery/item/10567/centerline_NIH0Rhk.pdf
+# 2018-06-20 jw,      -- usual suspects for paths to find autotrace on osx.
 
-__version__ = '0.7'	# Keep in sync with centerline-trace.inx ca. line 3 and 24
-__author__ = 'Juergen Weigert <juewei@fabmail.org>'
+__version__ = '0.7a'	# Keep in sync with centerline-trace.inx ca. line 3 and 24
+__author__ = 'Juergen Weigert <juergen@fabmail.org>'
 
 import sys, os, re, math, tempfile, subprocess, base64, time
 
@@ -70,12 +71,17 @@ except:
 # debug = True
 debug = False
 
+autotrace_exe = 'autotrace'
+
 # search path, so that inkscape libraries are found when we are standalone.
 sys_platform = sys.platform.lower()
 if sys_platform.startswith('win'):	# windows
   sys.path.append('C:\Program Files\Inkscape\share\extensions')
 elif sys_platform.startswith('darwin'):	# mac
-  sys.path.append('/Applications/Inkscape.app/Contents/Resources/extensions')
+  sys.path.append(       '/Applications/Inkscape.app/Contents/Resources/extensions')
+  os.environ['PATH'] += ':/Applications/Inkscape.app/Contents/Resources/extensions'
+  os.environ['PATH'] += ':' + os.environ.get('HOME', '') + '/.config/inkscape/extensions'
+  os.environ['PATH'] += ':/usr/local/bin'
 else:   				# linux
   # if sys_platform.startswith('linux'):
   sys.path.append('/usr/share/inkscape/extensions')
@@ -116,7 +122,7 @@ class TraceCenterline(inkex.Effect):
     self.filter_equal_light = 0.0        # [0.0 .. 1.9] Use 1.0 with photos. Use 0.0 with perfect scans.
 
     # Test if autotrace is installed and in path
-    command = "autotrace --version"
+    command = autotrace_exe + ' --version"
             
     p = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     return_code = p.wait()
@@ -170,7 +176,7 @@ class TraceCenterline(inkex.Effect):
     all outputs. The output with the longest total path and the least path elements wins.
     """
     num_attempts = self.candidates	# 15 is great. min 1, max 255, beware it gets much slower with more attempts.
-    autotrace_cmd = ['autotrace', '--centerline', '--input-format=pbm', '--output-format=svg' ]
+    autotrace_cmd = [autotrace_exe, '--centerline', '--input-format=pbm', '--output-format=svg' ]
     autotrace_cmd += self.autotrace_opts
 
     stroke_style_add = 'stroke-width:%.2f; fill:none; stroke-linecap:round;'

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <inkscape-extension xmlns="http://www.inkscape.org/namespace/inkscape/extension">
-  <_name>Centerline Trace 0.7</_name><!-- CAUTION: keep in sync with centerline_trace.py ca. line 55 __version__ = ... -->
+  <_name>Centerline Trace 0.7a</_name><!-- CAUTION: keep in sync with centerline_trace.py ca. line 55 __version__ = ... -->
   <id>com.github.fablabnbg.inskscape-centerline-trace</id>
   <dependency type="extension">org.inkscape.output.svg.inkscape</dependency>
   <dependency type="executable" location="extensions">inkex.py</dependency>
@@ -16,12 +16,12 @@
   </param>
   <param name="equal-light" type="float" min="0.0" max="1.9" precision="1" _gui-text="Equalize illumination. Use 1.0 with flash photography, use 0.0 to disable. (Default: 0.0)">0.0</param>
   <param name="despecle" type="int" min="0" max="9" _gui-text="Apply a median filter. 0: no filter, 5: for strong noise reduction. (Default: 0)">0</param>
-  <param name="about_who" type="description">(C) 2016 Jürgen Weigert (juewei@fabmail.org) and contributors.
+  <param name="about_who" type="description">(C) 2016-2018 Jürgen Weigert (juergen@fabmail.org) and contributors.
   For updates, praise or bug reports please refer to
   https://github.com/fablabnbg/inkscape-centerline-trace
   </param>
   <!-- CAUTION: Keep in sync with centerline_trace.py ca. line 55 __version__ = ... -->
-  <param name="about_version" type="description">Version 0.7</param>
+  <param name="about_version" type="description">Version 0.7a</param>
 
   <effect needs-live-preview="false" >
     <object-type>path</object-type>
