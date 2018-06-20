@@ -15,15 +15,15 @@ In inkscape it shows up under Extensions -> Images -> Centerline Trace ...
 
 Installation hints
 ------------------
-* **Install the extension**
-    * the extension requires the installation of autotrace (see below)
+* **Install the extension (all operating systems)**
+    * the extension requires the installation of autotrace and python-pil (see below)
     * download the [zip file](https://github.com/fablabnbg/inkscape-centerline-trace/archive/master.zip) of [inkscape-centerline-trace](https://github.com/fablabnbg/inkscape-centerline-trace) and unpack it
     * copy the files centerline-trace.inx, centerline-trace.py to your Inkscape User extensions folder (see Edit > Preferences > System: System info: User extensions)
 * **Install autotrace / python-pil**
     * **Windows**
         * Instructions for Inkscape 0.92.2 and higher: 
-        * download the [autotrace binary](https://github.com/scottvr/autotrace-win64-binaries/raw/master/bin/autotrace.exe) from [autotrace-win64-binaries github repo](https://github.com/scottvr/autotrace-win64-binaries).
-        * copy the downloaded autotrace.exe to Inkscape's User extensions folder
+            * download the [autotrace binary](https://github.com/scottvr/autotrace-win64-binaries/raw/master/bin/autotrace.exe) from [autotrace-win64-binaries github repo](https://github.com/scottvr/autotrace-win64-binaries).
+            * copy the downloaded autotrace.exe to Inkscape's User extensions folder
         * Instructions for Inkscape 0.92: https://inkscape.org/en/gallery/item/10567/centerline_NIH0Rhk.pdf
     * **MacOS**
         * autotrace is no longer available: http://macappstore.org/autotrace/ . Please see https://github.com/fablabnbg/inkscape-centerline-trace/issues/13
