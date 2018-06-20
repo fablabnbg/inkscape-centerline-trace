@@ -81,7 +81,7 @@ elif sys_platform.startswith('darwin'):	# mac
   sys.path.append(       '/Applications/Inkscape.app/Contents/Resources/extensions')
   os.environ['PATH'] += ':/Applications/Inkscape.app/Contents/Resources/extensions'
   os.environ['PATH'] += ':' + os.environ.get('HOME', '') + '/.config/inkscape/extensions'
-  os.environ['PATH'] += ':/usr/local/bin'
+  os.environ['PATH'] += ':/usr/local/bin:/usr/local/lib'
 else:   				# linux
   # if sys_platform.startswith('linux'):
   sys.path.append('/usr/share/inkscape/extensions')
