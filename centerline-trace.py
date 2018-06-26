@@ -122,7 +122,7 @@ class TraceCenterline(inkex.Effect):
     self.filter_equal_light = 0.0        # [0.0 .. 1.9] Use 1.0 with photos. Use 0.0 with perfect scans.
 
     # Test if autotrace is installed and in path
-    command = autotrace_exe + ' --version"
+    command = autotrace_exe + ' --version'
             
     p = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     return_code = p.wait()
