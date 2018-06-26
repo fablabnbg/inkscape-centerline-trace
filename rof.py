@@ -1,4 +1,4 @@
-# http://www.janeriksolem.net/2009/03/these-days-it-seems-there-are-lots-of.html
+
 #
 # http://de.slideshare.net/Moment_of_Revelation/programming-computer-vision-with-python-32888766
 # The ROF model has the interesting property that it ﬁnds a smoother version of
