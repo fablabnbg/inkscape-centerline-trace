@@ -52,8 +52,9 @@
 # 2017-03-05 jw,      -- instructions for mac added: http://macappstore.org/autotrace/
 # 2017-07-12 jw,      -- instructions for windows added: https://inkscape.org/en/gallery/item/10567/centerline_NIH0Rhk.pdf
 # 2018-06-20 jw,      -- usual suspects for paths to find autotrace on osx.
+# 2018-10-10 jw, V0.7b --  require python-lxml for deb.
 
-__version__ = '0.7a'	# Keep in sync with centerline-trace.inx ca. line 3 and 24
+__version__ = '0.7b'	# Keep in sync with centerline-trace.inx ca. line 3 and 24
 __author__ = 'Juergen Weigert <juergen@fabmail.org>'
 
 import sys, os, re, math, tempfile, subprocess, base64, time

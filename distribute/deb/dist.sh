@@ -4,7 +4,7 @@
 name=$1
 vers=$2
 url=http://github.com/fablabnbg/inkscape-centerline-trace
-requires="autotrace, python3-pil | bash, python-pil"
+requires="autotrace, python-lxml, python3-pil | bash, python-pil"
 
 tmp=../out
 
