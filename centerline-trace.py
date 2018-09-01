@@ -52,9 +52,12 @@
 # 2017-03-05 jw,      -- instructions for mac added: http://macappstore.org/autotrace/
 # 2017-07-12 jw,      -- instructions for windows added: https://inkscape.org/en/gallery/item/10567/centerline_NIH0Rhk.pdf
 # 2018-06-20 jw,      -- usual suspects for paths to find autotrace on osx.
-# 2018-10-10 jw, V0.7b --  require python-lxml for deb.
+# 2018-08-10 jw, V0.7b --  require python-lxml for deb.
+# 2018-08-31 jw, V0.8 -- MacOS instructions updated and MacOS path added for autotrace 0.40.0 from
+#                        https://github.com/jnweiger/autotrace/releases
 
-__version__ = '0.7b'	# Keep in sync with centerline-trace.inx ca. line 3 and 24
+
+__version__ = '0.8'	# Keep in sync with centerline-trace.inx ca. line 3 and 24
 __author__ = 'Juergen Weigert <juergen@fabmail.org>'
 
 import sys, os, re, math, tempfile, subprocess, base64, time
@@ -82,6 +85,7 @@ elif sys_platform.startswith('darwin'):	# mac
   sys.path.append(       '/Applications/Inkscape.app/Contents/Resources/extensions')
   os.environ['PATH'] += ':/Applications/Inkscape.app/Contents/Resources/extensions'
   os.environ['PATH'] += ':' + os.environ.get('HOME', '') + '/.config/inkscape/extensions'
+  os.environ['PATH'] += ':/Applications/autotrace.app/Contents/MacOS'
   os.environ['PATH'] += ':/usr/local/bin:/usr/local/lib'
 else:   				# linux
   # if sys_platform.startswith('linux'):
@@ -124,17 +128,17 @@ class TraceCenterline(inkex.Effect):
 
     # Test if autotrace is installed and in path
     command = autotrace_exe + ' --version'
-            
+
     p = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     return_code = p.wait()
     f = p.stdout
     err = p.stderr
-            
+
     out = p.communicate()[0]
-            
+
     found = out.find('AutoTrace')
     if found == -1:
-        print >>sys.stderr, "You need to install autotrace for this extension to work! (macOS: http://macappstore.org/autotrace/ , Windows: see https://sourceforge.net/projects/autotrace/, Debian/Ubuntu: apt-get install autotrace.)"
+        print >>sys.stderr, "You need to install autotrace for this extension to work. Try https://github.com/jnweiger/autotrace/releases or google for autotrace version 0.40.0 or later. (Windows: see https://sourceforge.net/projects/autotrace/ )"
         exit()
 
     try:
@@ -168,9 +172,9 @@ class TraceCenterline(inkex.Effect):
 
   def svg_centerline_trace(self, image_file):
     """ svg_centerline_trace prepares the image by
-    a) limiting_size (aka runtime), 
-    b) removing noise, 
-    c) linear histogram expansion, 
+    a) limiting_size (aka runtime),
+    b) removing noise,
+    c) linear histogram expansion,
     d) equalized spatial illumnination (my own algorithm)
 
     Then we run several iterations of autotrace and find the optimal black white threshold by evaluating
@@ -189,7 +193,7 @@ class TraceCenterline(inkex.Effect):
       im = im.convert("RGBA")
       if self.invert_image:
         bg = Image.new('RGBA', im.size, (0,0,0,255)) # black background
-      else:  
+      else:
         bg = Image.new('RGBA', im.size, (255,255,255,255)) # white background
       im = Image.alpha_composite(bg, im)
 
@@ -284,7 +288,7 @@ class TraceCenterline(inkex.Effect):
       if debug: print >>sys.stderr, "pbm from bw done"
       # try:
       p = subprocess.Popen(autotrace_cmd + [fp.name], stdout=subprocess.PIPE)
-      
+
       # the following crashes Inkscape (!) when used with GUI and autotrace not installed
       #except Exception as e:
         #print '+ '+' '.join(autotrace_cmd)
@@ -401,27 +405,27 @@ class TraceCenterline(inkex.Effect):
         if debug: print >>self.tty, "linked image path: ="+filename
       elif href[:11] == 'data:image/':
         l = href[11:].index(';')
-	type = href[11:11+l]			# 'png' 'jpeg'
+        type = href[11:11+l]			# 'png' 'jpeg'
         if debug: print >>self.tty, "embedded image: "+href[:11+l]
         img=base64.decodestring(href[11+l+8:])
-	f=tempfile.NamedTemporaryFile(mode="wb", suffix="."+type, delete=False)
-	f.write(img)
-	filename=f.name
-	f.close()
+        f=tempfile.NamedTemporaryFile(mode="wb", suffix="."+type, delete=False)
+        f.write(img)
+        filename=f.name
+        f.close()
       else:
         inkex.errormsg(_("Neither file:// nor data:image/png; prefix. Cannot parse PNG image href "+href))
-	sys.exit(1)
+        sys.exit(1)
       if debug: print >>self.tty, "filename="+filename
       #
       path_svg,stroke_width,im_size = self.svg_centerline_trace(filename)
       xml = inkex.etree.fromstring(path_svg)
       try:
         path_d=xml.find('path').attrib['d']
-      except: 
+      except:
         inkex.errormsg(_("Couldn't trace the path. Please make sure that the checkbox for tracing bright lines is set correctly and that your drawing has enough contrast."))
         sys.exit(1)
-      
-      # images can also just have a transform attribute, and no x or y, 
+
+      # images can also just have a transform attribute, and no x or y,
       # could be replaced by a (slower) call to command line, or by computeBBox from simpletransform
       x_off = float(node.get('x', 0))
       y_off = float(node.get('y', 0))
