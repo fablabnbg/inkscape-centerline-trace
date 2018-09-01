@@ -26,9 +26,17 @@ Installation hints
             * copy the downloaded autotrace.exe to Inkscape's User extensions folder
         * Instructions for Inkscape 0.92: https://inkscape.org/en/gallery/item/10567/centerline_NIH0Rhk.pdf
     * **MacOS**
-        * autotrace is no longer available: http://macappstore.org/autotrace/ . Please see https://github.com/fablabnbg/inkscape-centerline-trace/issues/13
+        * Install autotrace MacOS.zip version 0.40.0 or later from e.g. https://github.com/jnweiger/autotrace/releases
+        * open a command line shell to install the python-PIL module:
+          + `sudo easy_install install pip`
+          + `sudo pip install pillow`
+        * open a command line shell to install the inkscape extension:
+          + `cd ~/.config/inkscape/extensions`
+          + `curl https://raw.githubusercontent.com/fablabnbg/inkscape-centerline-trace/master/centerline-trace.py -o centerline-trace.py`
+          + `curl https://raw.githubusercontent.com/fablabnbg/inkscape-centerline-trace/master/centerline-trace.inx -o centerline-trace.inx`
+        * Please report success in the github issues. As of 2018-08-31, MacOS Support is back, but highly experimental.
     * **GNU/Linux**      
-        * The autotrace dependency may or may not be available for your distribution. On Ubuntu (and derivatives) <= 16.04, you can install it with `sudo apt-get install autotrace`. Please read https://github.com/fablabnbg/inkscape-centerline-trace/issues/13 before you install it. Autotrace may become available again, due to the work of Peter Lemenkov.
+        * Install the autotrace DEB package version 0.40.0 or later from e.g. https://github.com/jnweiger/autotrace/releases
         * if you do not have pillow/pil installed, the extension will output an error message prompting you to install it. On Ubuntu and derivatives, run `sudo apt-get install python-pil` to install.
 
 
