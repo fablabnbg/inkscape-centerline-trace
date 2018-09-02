@@ -22,8 +22,10 @@ Installation hints
 * **Install autotrace / python-pil**
     * **Windows**
         * Instructions for Inkscape 0.92.2 and higher: 
-            * download the [autotrace binary](https://github.com/scottvr/autotrace-win64-binaries/raw/master/bin/autotrace.exe) from [autotrace-win64-binaries github repo](https://github.com/scottvr/autotrace-win64-binaries).
-            * copy the downloaded autotrace.exe to Inkscape's User extensions folder
+            * Install autotrace win64-setup.zip version 0.40.0 or later from e.g. https://github.com/jnweiger/autotrace/releases
+              Make sure the installation path is C:\Program Files (x86)\AutoTrace -- this application searches there.
+              - Older version: [autotrace binary](https://github.com/scottvr/autotrace-win64-binaries/raw/master/bin/autotrace.exe) from [autotrace-win64-binaries github repo](https://github.com/scottvr/autotrace-win64-binaries))
+                Copy the downloaded autotrace.exe to Inkscape's User extensions folder, that should also work.
         * Instructions for Inkscape 0.92: https://inkscape.org/en/gallery/item/10567/centerline_NIH0Rhk.pdf
     * **MacOS**
         * Install autotrace MacOS.zip version 0.40.0 or later from e.g. https://github.com/jnweiger/autotrace/releases

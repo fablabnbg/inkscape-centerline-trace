@@ -55,9 +55,10 @@
 # 2018-08-10 jw, V0.7b --  require python-lxml for deb.
 # 2018-08-31 jw, V0.8 -- MacOS instructions updated and MacOS path added for autotrace 0.40.0 from
 #                        https://github.com/jnweiger/autotrace/releases
+# 2018-09-01 jw, V0.8a -- Windows Path added
 
 
-__version__ = '0.8'	# Keep in sync with centerline-trace.inx ca. line 3 and 24
+__version__ = '0.8a'	# Keep in sync with centerline-trace.inx ca. line 3 and 24
 __author__ = 'Juergen Weigert <juergen@fabmail.org>'
 
 import sys, os, re, math, tempfile, subprocess, base64, time
@@ -81,6 +82,9 @@ autotrace_exe = 'autotrace'
 sys_platform = sys.platform.lower()
 if sys_platform.startswith('win'):	# windows
   sys.path.append('C:\Program Files\Inkscape\share\extensions')
+  os.environ['PATH'] += os.pathsep + 'C:\Program Files\Inkscape\share\extensions'
+  os.environ['PATH'] += os.pathsep + 'C:\Program Files (x86)\AutoTrace'
+  os.environ['PATH'] += os.pathsep + 'C:\Program Files\AutoTrace'
 elif sys_platform.startswith('darwin'):	# mac
   sys.path.append(       '/Applications/Inkscape.app/Contents/Resources/extensions')
   os.environ['PATH'] += ':/Applications/Inkscape.app/Contents/Resources/extensions'
@@ -138,7 +142,7 @@ class TraceCenterline(inkex.Effect):
 
     found = out.find('AutoTrace')
     if found == -1:
-        print >>sys.stderr, "You need to install autotrace for this extension to work. Try https://github.com/jnweiger/autotrace/releases or google for autotrace version 0.40.0 or later. (Windows: see https://sourceforge.net/projects/autotrace/ )"
+        print >>sys.stderr, "You need to install autotrace for this extension to work. Try https://github.com/jnweiger/autotrace/releases or search for autotrace version 0.40.0 or later."
         exit()
 
     try:
