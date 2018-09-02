@@ -1,15 +1,15 @@
 #!/bin/bash
+
+cd $(dirname $0)
+
 echo "Determining Version:"
 VERSION=$(sed -ne 's@.*version\s\([a-z0-9\.]*\).*@\1@pi' ../centerline-trace.inx)
 echo "Version is: \"$VERSION\""
 name=inkscape-centerline-trace
-if [ -d $name ]
-then
-	echo "Removing leftover files"
-	rm -rf $name
-fi
+rm -rf $name
+
 echo "Copying contents ..."
-mkdir $name
+mkdir -p $name
 cp ../README.md $name/README
 cp ../LICENSE* $name/
 cp ../centerline-trace-poster.svg $name/
@@ -17,14 +17,21 @@ cp ../*.py ../*.inx ../Makefile $name/
 
 
 echo "****************************************************************"
-echo "Ubuntu Version: For Building you must have checkinstall and dpkg"
+echo "Ubuntu Version: needs checkinstall and dpkg"
 echo "Build Ubuntu Version (Y/n)?"
 read answer
-if [ "$answer" != "n" ]
-then
+if [ "$answer" != "n" ]; then
   mkdir -p deb/files
   cp -a $name/* deb/files
   (cd deb && sh ./dist.sh $name $VERSION)
+fi
+
+echo "****************************************************************"
+echo "Windows Version: needs makensis"
+echo "Build Windows Version (Y/n)?"
+read answer
+if [ "$answer" != "n" ]; then
+  (cd win && sh ./dist.sh $name $VERSION)
 fi
 
 

@@ -13,10 +13,10 @@ mkdir $tmp
 cp description-pak files
 cd files
 fakeroot checkinstall --fstrans --reset-uid --type debian \
-  --install=no -y --pkgname $name --pkgversion $vers --arch all \
+  --install=no -y --pkgname $name --pkgversion $vers --pkgrelease $(date +%Y%m%d) --arch all \
   --pkglicense LGPL --pkggroup other --pakdir ../$tmp --pkgsource $url \
   --pkgaltsource "http://fablab-nuernberg.de" \
-  --maintainer "'Juergen Weigert (juewei@fabmail.org)'" \
+  --maintainer "'Juergen Weigert (juergen@fabmail.org)'" \
   --requires "'$requires'" make install \
   -e PREFIX=/usr || { echo "error"; exit 1; }
 
