@@ -56,9 +56,11 @@
 # 2018-08-31 jw, V0.8 -- MacOS instructions updated and MacOS path added for autotrace 0.40.0 from
 #                        https://github.com/jnweiger/autotrace/releases
 # 2018-09-01 jw, V0.8a -- Windows Path added
+# 2018-09-03 jw, V0.8b -- New option: cliprect, hairline, at_filter_iterations, at_error_threshold added. 
+#                         Fixed stroke_width of scaled images.
 
 
-__version__ = '0.8a'	# Keep in sync with centerline-trace.inx ca. line 3 and 24
+__version__ = '0.8b'	# Keep in sync with centerline-trace.inx ca. line 3 and 24
 __author__ = 'Juergen Weigert <juergen@fabmail.org>'
 
 import sys, os, re, math, tempfile, subprocess, base64, time
@@ -129,6 +131,8 @@ class TraceCenterline(inkex.Effect):
     self.candidates = 15		 # [1..255] Number of autotrace candidate runs.
     self.filter_median = 0		 # 0 to disable median filter.
     self.filter_equal_light = 0.0        # [0.0 .. 1.9] Use 1.0 with photos. Use 0.0 with perfect scans.
+    self.hairline = False                # Fixed linewidth.
+    self.hairline_width = 0.1            # Width of hairline [mm]
 
     # Test if autotrace is installed and in path
     command = autotrace_exe + ' --version'
@@ -152,13 +156,23 @@ class TraceCenterline(inkex.Effect):
         self.tty = open(os.devnull, 'w')  # '/dev/null' for POSIX, 'nul' for Windows.
       except:
         self.tty = open("CON:", 'w')	# windows. Does this work???
-    if debug: print >>self.tty, "__init__"
+    if debug: print >>self.tty, "TraceCenterline: __init__"
 
     self.OptionParser.add_option('-V', '--version',
           action = 'store_const', const=True, dest='version', default=False,
           help='Just print version number ("'+__version__+'") and exit.')
     self.OptionParser.add_option('-i', '--invert', action='store', type='inkbool', default=False, help='Trace bright lines. (Default: dark lines)')
+    self.OptionParser.add_option('-C', '--cliprect', action='store', type='inkbool', default=False, help='Clip to selected rectangle. (Default: Trace entire bitmap)')
     self.OptionParser.add_option('-r', '--remove', action='store', type='inkbool', default=False, help='Replace image with vector graphics. (Default: Place on top)')
+    self.OptionParser.add_option('-H', '--hairline', action='store', type='inkbool', default=False, help='Fixed linewidth. (Default: Automatic)')
+    self.OptionParser.add_option('-W', '--hairline-width', action='store',
+          type='float', default=0.1, help="Width of a hairline [mm] (Default: 0.1)")
+
+    self.OptionParser.add_option('--at-error-threshold', action='store',
+          type='float', default=2.0, help="Autotrace: Subdivide fitted curves that are offset by a number of pixels exceeding the specified real number (default: 2.0)")
+    self.OptionParser.add_option('--at-filter-iterations', action='store',
+          type='int', default=4, help="Autotrace: Smooth the curve the specified number of times prior to fitting (default: 4)")
+
     self.OptionParser.add_option('-m', '--megapixels', action='store',
           type='float', default=2.0, help="Limit image size in megapixels. (Lower is faster)")
     self.OptionParser.add_option('-e', '--equal-light', action='store',
@@ -167,14 +181,14 @@ class TraceCenterline(inkex.Effect):
           type='int', default=15, help="[1..255] Autotrace candidate runs. (Lower is much faster)")
     self.OptionParser.add_option('-d', '--despecle', action='store',
           type='int', default=0, help="[0..9] Apply median filter for noise reduction. (Default 0, off)")
-    self.OptionParser.add_option('-D', '--debug', action='store_const', const=True, default=False, dest='debug', help='Switch on debugging, shows processed pictures.')
+    self.OptionParser.add_option('-D', '--debug-show', action='store_const', const=True, default=False, dest='debug', help='debugging: shows processed pictures.')
 
   def version(self):
     return __version__
   def author(self):
     return __author__
 
-  def svg_centerline_trace(self, image_file):
+  def svg_centerline_trace(self, image_file, cliprect=None):
     """ svg_centerline_trace prepares the image by
     a) limiting_size (aka runtime),
     b) removing noise,
@@ -183,15 +197,40 @@ class TraceCenterline(inkex.Effect):
 
     Then we run several iterations of autotrace and find the optimal black white threshold by evaluating
     all outputs. The output with the longest total path and the least path elements wins.
+
+    A cliprect dict with the keys x, y, w, h can be specified. All 4 are expected in the 
+    range 0..1 and are mapped to the image width and height.
     """
     num_attempts = self.candidates	# 15 is great. min 1, max 255, beware it gets much slower with more attempts.
-    autotrace_cmd = [autotrace_exe, '--centerline', '--input-format=pbm', '--output-format=svg' ]
+    autotrace_cmd = [ autotrace_exe,
+        '--filter-iterations', str(self.options.at_filter_iterations),
+        '--error-threshold', str(self.options.at_error_threshold),
+        '--centerline',
+        '--input-format=pbm',
+        '--output-format=svg' ]
     autotrace_cmd += self.autotrace_opts
 
     stroke_style_add = 'stroke-width:%.2f; fill:none; stroke-linecap:round;'
 
-    if debug: print >>sys.stderr, "svg_centerline_trace start "+image_file
+
+    if debug: print >>self.tty, "svg_centerline_trace start "+image_file
+    if debug: print >>self.tty, '+ '+' '.join(autotrace_cmd)
     im = Image.open(image_file)
+    orig_im_size = (im.size[0], im.size[1])
+    box=[0,0,0,0]
+    if cliprect is not None:
+      box[0] = cliprect['x'] * im.size[0]
+      box[1] = cliprect['y'] * im.size[1]
+      # sorted(min, val, max)[1] does clamping without chaining min(max()) in an ugly way.
+      box[2] = sorted((0, int(0.5 + box[0] + cliprect['w'] * im.size[0]), im.size[0]))[1]
+      box[3] = sorted((0, int(0.5 + box[1] + cliprect['h'] * im.size[1]), im.size[1]))[1]
+      box[0] = sorted((0, int(0.5 + box[0]),                              im.size[0]))[1]
+      box[1] = sorted((0, int(0.5 + box[1]),                              im.size[1]))[1]
+      im = im.crop(box)
+      if box[0] == box[2] or box[1] == box[3]:
+        print >>sys.stderr, "ERROR: Cliprect and Image do not overlap.", orig_im_size, box, cliprect
+        return ( '<svg/>', 1, orig_im_size)
+
     if 'A' in im.mode:
       # this image has alpha. Paste it onto white or black.
       im = im.convert("RGBA")
@@ -202,7 +241,7 @@ class TraceCenterline(inkex.Effect):
       im = Image.alpha_composite(bg, im)
 
     im = im.convert(mode='L', dither=None)
-    if debug: print >>sys.stderr, "seen: " + str([im.format, im.size, im.mode])
+    if debug: print >>self.tty, "seen: " + str([im.format, im.size, im.mode])
     scale_limit = math.sqrt(im.size[0] * im.size[1] * 0.000001 / self.megapixel_limit)
     if scale_limit > 1.0:
       print >>sys.stderr, "Megapixel limit ("+str(self.megapixel_limit)+ ") exceeded. Scaling down by factor : "+str(scale_limit)
@@ -212,7 +251,7 @@ class TraceCenterline(inkex.Effect):
 
     if self.filter_median > 0:
       if self.filter_median % 2 == 0: self.filter_median = self.filter_median + 1	# need odd values.
-      im = im.filter(ImageFilter.MedianFilter(size=self.filter_median))	# a feeble denoise attempt. FIXME: try ROF instead.
+      im = im.filter(ImageFilter.MedianFilter(size=self.filter_median))	                # feeble denoise attempt. FIXME: try ROF instead.
     im = ImageOps.autocontrast(im, cutoff=2)	# linear expand histogram (an alternative to equalize)
 
     # not needed here:
@@ -223,12 +262,12 @@ class TraceCenterline(inkex.Effect):
       im_neg_thumb = ImageOps.invert(im.resize((int(im.size[0]/scale_thumb), int(im.size[1]/scale_thumb)), resample = Image.BILINEAR))
       im_neg_thumb = im_neg_thumb.filter(ImageFilter.GaussianBlur(radius=30))
       im_neg_blur = im_neg_thumb.resize(im.size, resample=Image.BILINEAR)
-      if debug: im_neg_blur.show()
+      if self.options.debug: im_neg_blur.show()
 
-      if debug: print >>sys.stderr, "ImageOps.equalize(im) done"
+      if debug: print >>self.tty, "ImageOps.equalize(im) done"
       im = Image.blend(im, im_neg_blur, self.filter_equal_light*0.5)
       im = ImageOps.autocontrast(im, cutoff=0)	# linear expand histogram (an alternative to equalize)
-      if debug: im.show()
+      if self.options.debug: im.show()
 
     def svg_pathstats(path_d):
       """ calculate statistics from an svg path:
@@ -275,21 +314,21 @@ class TraceCenterline(inkex.Effect):
     # ...
 
     candidate = {}
-    if debug: im.show()
+    if self.options.debug: im.show()
 
     for i in range(num_attempts):
       threshold = int(256.*(1+i)/(num_attempts+1))
       lut = [ 255 for n in range(threshold) ] + [ 0 for n in range(threshold,256) ]
-      if debug: print >>sys.stderr, "attempt "+ str(i)
+      if debug: print >>self.tty, "attempt "+ str(i)
       bw = im.point(lut, mode='1')
-      if debug: print >>sys.stderr, "bw from lut done: threshold=%d" % threshold
-      if debug: bw.show(command="/usr/bin/display -title=bw:threshold=%d" % threshold)
+      if debug: print >>self.tty, "bw from lut done: threshold=%d" % threshold
+      if self.options.debug: bw.show(command="/usr/bin/display -title=bw:threshold=%d" % threshold)
       cand = { 'threshold':threshold, 'img_width':bw.size[0], 'img_height':bw.size[1], 'mean': ImageStat.Stat(im).mean[0] }
-      fp = tempfile.NamedTemporaryFile(suffix='.pbm', delete=False)
+      fp = tempfile.NamedTemporaryFile(prefix="certerlinetrace", suffix='.pbm', delete=False)
       fp.write("P4\n%d %d\n" % (bw.size[0], bw.size[1]))
       fp.write(bw.tobytes())
       fp.close()
-      if debug: print >>sys.stderr, "pbm from bw done"
+      if debug: print >>self.tty, "pbm from bw done"
       # try:
       p = subprocess.Popen(autotrace_cmd + [fp.name], stdout=subprocess.PIPE)
 
@@ -301,16 +340,20 @@ class TraceCenterline(inkex.Effect):
         #sys.exit(1)
 
       cand['svg'] = p.communicate()[0]
-      if debug: print >>sys.stderr, "autotrace done"
-
-      os.unlink(fp.name)
+      if debug: print >>self.tty, "autotrace done"
+      if not len(cand['svg']):
+        print >>sys.stderr, "autotrace_cmd: " + ' '.join(autotrace_cmd + [fp.name])
+        print >>sys.stderr, "ERROR: returned nothing, leaving tmp bmp file around for you to debug"
+        cand['svg'] = '<svg/>'                  # empty dummy
+      else:
+        os.unlink(fp.name)
       # <?xml version="1.0" standalone="yes"?>\n<svg width="86" height="83">\n<path style="stroke:#000000; fill:none;" d="M36 15C37.9219 18.1496 41.7926 19.6686 43.2585 23.1042C47.9556 34.1128 39.524 32.0995 35.179 37.6034C32.6296 40.8328 34 48.1105 34 52M36 17C32.075 22.4565 31.8375 30.074 35 36M74 42L46 38C45.9991 46.1415 46.7299 56.0825 45.6319 64C44.1349 74.7955 23.7094 77.5566 16.044 72.3966C7.27363 66.4928 8.04426 45.0047 16.2276 38.7384C20.6362 35.3626 27.7809 36.0006 33 36M44 37L45 37"/>\n</svg>
       try:
         xml = inkex.etree.fromstring(cand['svg'])
       except:
-        print >>sys.stderr, "autotrace_cmd: " + ' '.join(autotrace_cmd)
+        print >>sys.stderr, "autotrace_cmd: " + ' '.join(autotrace_cmd + [fp.name])
         print >>sys.stderr, "ERROR: no proper xml returned: '" + cand['svg'] + "'"
-        xml = inkex.etree.fromstring('<svg/>'); # empty dummy
+        xml = inkex.etree.fromstring('<svg/>')          # empty dummy
 
       p_len,p_seg,p_pts = 0,0,0
       for p in xml.findall('path'):
@@ -342,13 +385,13 @@ class TraceCenterline(inkex.Effect):
       if calc_weight(c,n) > calc_weight(candidate[best_weight_idx], best_weight_idx):
         best_weight_idx = n
 
-    if debug: print >>sys.stderr, "best: %d/%d" % (best_weight_idx, num_attempts)
+    if debug: print >>self.tty, "best: %d/%d" % (best_weight_idx, num_attempts)
     ## if standalone:
     # svg = re.sub('stroke:', (stroke_style_add % candidate[best_weight_idx]['strokewidth']) + ' stroke:', candidate[best_weight_idx]['svg'])
     # return svg
 
     ## inkscape-extension:
-    return ( candidate[best_weight_idx]['svg'], candidate[best_weight_idx]['strokewidth'], im.size )
+    return ( candidate[best_weight_idx]['svg'], candidate[best_weight_idx]['strokewidth'], orig_im_size )
 
 
   def calc_unit_factor(self, units='mm'):
@@ -366,25 +409,66 @@ class TraceCenterline(inkex.Effect):
     if self.options.version:
       print __version__
       sys.exit(0)
-    if self.options.invert      is not None: self.invert_image       = self.options.invert
-    if self.options.remove      is not None: self.replace_image      = self.options.remove
-    if self.options.megapixels  is not None: self.megapixel_limit    = self.options.megapixels
-    if self.options.candidates  is not None: self.candidates         = self.options.candidates
-    if self.options.despecle    is not None: self.filter_median      = self.options.despecle
-    if self.options.equal_light is not None: self.filter_equal_light = self.options.equal_light
-    if self.options.debug       is not None: debug                   = self.options.debug
+    if self.options.invert         is not None: self.invert_image       = self.options.invert
+    if self.options.remove         is not None: self.replace_image      = self.options.remove
+    if self.options.megapixels     is not None: self.megapixel_limit    = self.options.megapixels
+    if self.options.candidates     is not None: self.candidates         = self.options.candidates
+    if self.options.despecle       is not None: self.filter_median      = self.options.despecle
+    if self.options.equal_light    is not None: self.filter_equal_light = self.options.equal_light
+    if self.options.hairline       is not None: self.hairline           = self.options.hairline
+    if self.options.hairline_width is not None: self.hairline_width     = self.options.hairline_width
+    # if self.options.debug          is not None: debug                   = self.options.debug
 
     self.calc_unit_factor()
+
+    cliprect = None
+    if self.options.cliprect:
+      for id, node in self.selected.iteritems():
+        if node.tag == inkex.addNS('path','svg'):
+          print >>sys.stderr, "Error: id="+str(id)+" is a path.\nNeed a rectangle object for clipping."
+        if node.tag == inkex.addNS('rect','svg'):
+          if debug: print >>self.tty, "cliprect: id="+str(id), "node="+str(node.tag)
+          cliprect = {
+            'x': float(node.get('x', 0)),
+            'y': float(node.get('y', 0)),
+            'w': float(node.get('width', 0)),
+            'h': float(node.get('height', 0)),
+            'node': node
+          }
+          if debug: print >>self.tty, "cliprect: id="+str(id), "cliprect="+str(cliprect)
 
     if not len(self.selected.items()):
       inkex.errormsg(_("Please select an image."))
       return
 
+    if cliprect is not None and len(self.selected.items()) < 2:
+      inkex.errormsg(_("Please select an image. Only a cliprect was selected."))
+      return
+
     for id, node in self.selected.iteritems():
       if debug: print >>self.tty, "id="+str(id), "tag="+str(node.tag)
+      if self.options.cliprect and node.tag == inkex.addNS('rect','svg'):
+        continue
       if node.tag != inkex.addNS('image','svg'):
-        inkex.errormsg(_("Object "+id+" is not an image. seen:"+str(node.tag)+" expected:"+inkex.addNS('image','svg')+"\n Try - Object->Ungroup"))
+        inkex.errormsg(_("Object "+id+" is NOT an image. seen:"+str(node.tag)+" expected:"+inkex.addNS('image','svg')+"\n Try - Object->Ungroup"))
         return
+
+      # images can also just have a transform attribute, and no x or y,
+      # FIXME: should find the image transformation!
+      # could be replaced by a (slower) call to command line, or by computeBBox from simpletransform
+      svg_x_off = float(node.get('x', 0))
+      svg_y_off = float(node.get('y', 0))
+      svg_img_w = float(node.get('width',  0.001))
+      svg_img_h = float(node.get('height', 0.001))
+      if cliprect is not None:
+        # normalize cliprect into range 0..1
+        cliprect['x'] = cliprect['x'] - svg_x_off
+        cliprect['y'] = cliprect['y'] - svg_y_off
+        cliprect['x'] = cliprect['x'] / svg_img_w
+        cliprect['y'] = cliprect['y'] / svg_img_h 
+        cliprect['w'] = cliprect['w'] / svg_img_w
+        cliprect['h'] = cliprect['h'] / svg_img_h 
+
       # handle two cases. Embedded and linked images
       # <image .. xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAT8AA ..." preserveAspectRatio="none" height="432" width="425" transform="matrix(1,0,-0.52013328,0.85408511,0,0)"/>
       # <image  .. xlink:href="file:///home/jw/schaf.png"
@@ -421,7 +505,7 @@ class TraceCenterline(inkex.Effect):
         sys.exit(1)
       if debug: print >>self.tty, "filename="+filename
       #
-      path_svg,stroke_width,im_size = self.svg_centerline_trace(filename)
+      path_svg,stroke_width,im_size = self.svg_centerline_trace(filename, cliprect)
       xml = inkex.etree.fromstring(path_svg)
       try:
         path_d=xml.find('path').attrib['d']
@@ -429,31 +513,37 @@ class TraceCenterline(inkex.Effect):
         inkex.errormsg(_("Couldn't trace the path. Please make sure that the checkbox for tracing bright lines is set correctly and that your drawing has enough contrast."))
         sys.exit(1)
 
-      # images can also just have a transform attribute, and no x or y,
-      # could be replaced by a (slower) call to command line, or by computeBBox from simpletransform
-      x_off = float(node.get('x', 0))
-      y_off = float(node.get('y', 0))
-      sx = float(node.get('width'))/im_size[0]
-      sy = float(node.get('height'))/im_size[1]
-      if debug: print >>self.tty, "im_width ", node.get('width'), "sx=",sx
-      if debug: print >>self.tty, "im_height ", node.get('height'), "sy=",sy
-      if debug: print >>self.tty, "im_x ", x_off
-      if debug: print >>self.tty, "im_y ", y_off
+      sx = svg_img_w/im_size[0]
+      sy = svg_img_h/im_size[1]
+      if debug: print >>self.tty, "svg_im_width ",  svg_img_w, "sx=",sx
+      if debug: print >>self.tty, "svg_im_height ", svg_img_h, "sy=",sy
+      if debug: print >>self.tty, "im_x ", svg_x_off
+      if debug: print >>self.tty, "im_y ", svg_y_off
       if debug: print >>self.tty, "pixel_size= ", im_size
       ## map the coordinates of the returned pixel path to the coordinates of the original SVG image.
-      matrix = "translate(%g,%g) scale(%g,%g)" % (x_off, y_off, sx, sy)
+      if cliprect is not None:
+        svg_x_off = max(svg_x_off, float(cliprect['node'].get('x', 0)))
+        svg_y_off = max(svg_y_off, float(cliprect['node'].get('y', 0)))
+      matrix = "translate(%g,%g) scale(%g,%g)" % (svg_x_off, svg_y_off, sx, sy)
       #
       if href[:5] == 'data:':
         os.unlink(filename) ## it was a temporary file (representing an embedded image).
       #
       # Create SVG Path
+      if self.hairline:
+        stroke_width = self.hairline_width * 96. / 25.4         # mm2px FIXME: 96dpi is just a default guess.
+      else:
+        stroke_width = stroke_width * 0.5 * (abs(sx) + abs(sy))
       style = { 'stroke': '#000000', 'fill': 'none', 'stroke-linecap': 'round', 'stroke-width': stroke_width }
       if self.invert_image: style['stroke'] = '#777777'
       path_attr = { 'style': simplestyle.formatStyle(style), 'd': path_d, 'transform': matrix }
       ## insert the new path object
       inkex.etree.SubElement(self.current_layer, inkex.addNS('path', 'svg'), path_attr)
       ## delete the old image object
-      if self.replace_image: node.getparent().remove(node)
+      if self.replace_image: 
+        node.getparent().remove(node)
+        if cliprect is not None:        # and its cliprect ...
+          cliprect['node'].getparent().remove(cliprect['node'])
 
 
 

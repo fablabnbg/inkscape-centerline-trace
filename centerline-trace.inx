@@ -1,27 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <inkscape-extension xmlns="http://www.inkscape.org/namespace/inkscape/extension">
-  <_name>Centerline Trace 0.8a</_name><!-- CAUTION: keep in sync with line 24 below and centerline_trace.py ca. line 55 __version__ = ... -->
-  <id>com.github.fablabnbg.inskscape-centerline-trace</id>
+  <_name>Centerline Trace 0.8b</_name><!-- CAUTION: keep in sync with line 24 below and centerline_trace.py ca. line 55 __version__ = ... -->
+  <id>com.github.fablabnbg.inskscape-centerline-trace.dev</id>
   <dependency type="extension">org.inkscape.output.svg.inkscape</dependency>
   <dependency type="executable" location="extensions">inkex.py</dependency>
   <dependency type="executable" location="extensions">centerline-trace.py</dependency>
 
   <param name="remove" type="boolean" _gui-text="Replace image with vector graphics. (Default: Place on top)">false</param>
   <param name="invert" type="boolean" _gui-text="Trace bright lines. (Default: dark lines)">false</param>
+  <param name="cliprect" type="boolean" _gui-text="Clip to selected rectangle. (Default: Trace entire bitmap)">true</param>
+  <param name="hairline" type="boolean" _gui-text="Predefined line width. (Default: Automatic)">false</param>
+  <param name="hairline-width" type="float" min="0.01" max="9.99" precision="2" _gui-text="        Width of predefined line (Default: 0.1) [mm]">0.1</param>
   <param name="megapixels" type="float" min="0.1" max="99.9" precision="1" _gui-text="Limit image size in megapixels (Default: 2.0; lower is faster).">2.0</param>
-  <param name="candidates" type="int" min="1" max="255" _gui-text="[1..255] Autotrace candidate runs. Use 1 with noisy photos. (Default: 1; lower is much faster)">1</param>
+  <param name="candidates" type="int" min="1" max="255" _gui-text="[1..255] candidate runs. Use 1 with noisy photos. (Default: 1; lower is faster)">1</param>
   <param name="filters" type="description">
 
   Preprocessing filters:
   </param>
-  <param name="equal-light" type="float" min="0.0" max="1.9" precision="1" _gui-text="Equalize illumination. Use 1.0 with flash photography, use 0.0 to disable. (Default: 0.0)">0.0</param>
+  <param name="equal-light" type="float" min="0.0" max="1.9" precision="1" _gui-text="Equalize. Use 1.0 with flash photography, 0.0 to disable. (Default: 0.0)">0.0</param>
   <param name="despecle" type="int" min="0" max="9" _gui-text="Apply a median filter. 0: no filter, 5: for strong noise reduction. (Default: 0)">0</param>
+  <param name="autotrace-options" type="description">
+
+  Autotrace options:
+  </param>
+  <param name="at-filter-iterations" type="int" min="0" max="20" _gui-text="--filter-iterations [0..20] (Default: 4)">4</param>
+  <param name="at-error-threshold" type="float" min="1.0" max="10.0" precision="1" _gui-text="--error-threshold [1.0..10.0] (Default: 2.0)">2.0</param>
   <param name="about_who" type="description">(C) 2016-2018 Jürgen Weigert (juergen@fabmail.org) and contributors.
   For updates, praise or bug reports please refer to
   https://github.com/fablabnbg/inkscape-centerline-trace
   </param>
   <!-- CAUTION: Keep in sync with line 3 above and with centerline_trace.py ca. line 61 __version__ = ... -->
-  <param name="about_version" type="description">Version 0.8a</param>
+  <param name="about_version" type="description">Version 0.8b</param>
 
   <effect needs-live-preview="false" >
     <object-type>path</object-type>
