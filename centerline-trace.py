@@ -56,11 +56,13 @@
 # 2018-08-31 jw, V0.8 -- MacOS instructions updated and MacOS path added for autotrace 0.40.0 from
 #                        https://github.com/jnweiger/autotrace/releases
 # 2018-09-01 jw, V0.8a -- Windows Path added
-# 2018-09-03 jw, V0.8b -- New option: cliprect, hairline, at_filter_iterations, at_error_threshold added. 
+# 2018-09-03 jw, V0.8b -- New option: cliprect, hairline, at_filter_iterations, at_error_threshold added.
 #                         Fixed stroke_width of scaled images.
+# 2018-09-04 jw, V0.8c -- Fixed https://github.com/fablabnbg/inkscape-centerline-trace/issues/28
+#                         Hints for https://github.com/fablabnbg/inkscape-centerline-trace/issues/27 added.
 
 
-__version__ = '0.8b'	# Keep in sync with centerline-trace.inx ca. line 3 and 24
+__version__ = '0.8c'	# Keep in sync with centerline-trace.inx ca. line 3 and 24
 __author__ = 'Juergen Weigert <juergen@fabmail.org>'
 
 import sys, os, re, math, tempfile, subprocess, base64, time
@@ -75,8 +77,8 @@ except:
   sys.exit(1)
 
 
-# debug = True
 debug = False
+# debug = True
 
 autotrace_exe = 'autotrace'
 
@@ -139,13 +141,14 @@ class TraceCenterline(inkex.Effect):
 
     p = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     return_code = p.wait()
-    f = p.stdout
-    err = p.stderr
 
-    out = p.communicate()[0]
+    out,err = p.communicate()
 
     found = out.find('AutoTrace')
     if found == -1:
+        print >>sys.stderr, err
+        if err.find('cannot open shared object file'):
+          print >>sys.stderr, "NOTE: This build of autotrace is incompatible with your system, try a different build.\n"
         print >>sys.stderr, "You need to install autotrace for this extension to work. Try https://github.com/jnweiger/autotrace/releases or search for autotrace version 0.40.0 or later."
         exit()
 
@@ -198,7 +201,7 @@ class TraceCenterline(inkex.Effect):
     Then we run several iterations of autotrace and find the optimal black white threshold by evaluating
     all outputs. The output with the longest total path and the least path elements wins.
 
-    A cliprect dict with the keys x, y, w, h can be specified. All 4 are expected in the 
+    A cliprect dict with the keys x, y, w, h can be specified. All 4 are expected in the
     range 0..1 and are mapped to the image width and height.
     """
     num_attempts = self.candidates	# 15 is great. min 1, max 255, beware it gets much slower with more attempts.
@@ -252,7 +255,8 @@ class TraceCenterline(inkex.Effect):
     if self.filter_median > 0:
       if self.filter_median % 2 == 0: self.filter_median = self.filter_median + 1	# need odd values.
       im = im.filter(ImageFilter.MedianFilter(size=self.filter_median))	                # feeble denoise attempt. FIXME: try ROF instead.
-    im = ImageOps.autocontrast(im, cutoff=2)	# linear expand histogram (an alternative to equalize)
+    im = ImageOps.autocontrast(im, cutoff=0)	# linear expand histogram (an alternative to equalize)
+    ## cutoff=2 destroys some images, see https://github.com/fablabnbg/inkscape-centerline-trace/issues/28
 
     # not needed here:
     # im = im.filter(ImageFilter.UnsharpMask(radius=2, percent=150, threshold=3))	# parameters depend on size of image!
@@ -324,7 +328,7 @@ class TraceCenterline(inkex.Effect):
       if debug: print >>self.tty, "bw from lut done: threshold=%d" % threshold
       if self.options.debug: bw.show(command="/usr/bin/display -title=bw:threshold=%d" % threshold)
       cand = { 'threshold':threshold, 'img_width':bw.size[0], 'img_height':bw.size[1], 'mean': ImageStat.Stat(im).mean[0] }
-      fp = tempfile.NamedTemporaryFile(prefix="certerlinetrace", suffix='.pbm', delete=False)
+      fp = tempfile.NamedTemporaryFile(prefix="centerlinetrace", suffix='.pbm', delete=False)
       fp.write("P4\n%d %d\n" % (bw.size[0], bw.size[1]))
       fp.write(bw.tobytes())
       fp.close()
@@ -347,6 +351,7 @@ class TraceCenterline(inkex.Effect):
         cand['svg'] = '<svg/>'                  # empty dummy
       else:
         os.unlink(fp.name)
+
       # <?xml version="1.0" standalone="yes"?>\n<svg width="86" height="83">\n<path style="stroke:#000000; fill:none;" d="M36 15C37.9219 18.1496 41.7926 19.6686 43.2585 23.1042C47.9556 34.1128 39.524 32.0995 35.179 37.6034C32.6296 40.8328 34 48.1105 34 52M36 17C32.075 22.4565 31.8375 30.074 35 36M74 42L46 38C45.9991 46.1415 46.7299 56.0825 45.6319 64C44.1349 74.7955 23.7094 77.5566 16.044 72.3966C7.27363 66.4928 8.04426 45.0047 16.2276 38.7384C20.6362 35.3626 27.7809 36.0006 33 36M44 37L45 37"/>\n</svg>
       try:
         xml = inkex.etree.fromstring(cand['svg'])
@@ -418,6 +423,7 @@ class TraceCenterline(inkex.Effect):
     if self.options.hairline       is not None: self.hairline           = self.options.hairline
     if self.options.hairline_width is not None: self.hairline_width     = self.options.hairline_width
     # if self.options.debug          is not None: debug                   = self.options.debug
+    # self.options.debug = True
 
     self.calc_unit_factor()
 
@@ -465,12 +471,13 @@ class TraceCenterline(inkex.Effect):
         cliprect['x'] = cliprect['x'] - svg_x_off
         cliprect['y'] = cliprect['y'] - svg_y_off
         cliprect['x'] = cliprect['x'] / svg_img_w
-        cliprect['y'] = cliprect['y'] / svg_img_h 
+        cliprect['y'] = cliprect['y'] / svg_img_h
         cliprect['w'] = cliprect['w'] / svg_img_w
-        cliprect['h'] = cliprect['h'] / svg_img_h 
+        cliprect['h'] = cliprect['h'] / svg_img_h
 
       # handle two cases. Embedded and linked images
       # <image .. xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAT8AA ..." preserveAspectRatio="none" height="432" width="425" transform="matrix(1,0,-0.52013328,0.85408511,0,0)"/>
+      # <image .. xlink:href="xlink:href="data:image/jpeg;base64,/9j/4AAQSkZJRgAB..."
       # <image  .. xlink:href="file:///home/jw/schaf.png"
 
       href=str(node.get(inkex.addNS('href','xlink')))
@@ -496,12 +503,12 @@ class TraceCenterline(inkex.Effect):
         type = href[11:11+l]			# 'png' 'jpeg'
         if debug: print >>self.tty, "embedded image: "+href[:11+l]
         img=base64.decodestring(href[11+l+8:])
-        f=tempfile.NamedTemporaryFile(mode="wb", suffix="."+type, delete=False)
+        f=tempfile.NamedTemporaryFile(mode="wb", prefix='centerlinetrace', suffix="."+type, delete=False)
         f.write(img)
         filename=f.name
         f.close()
       else:
-        inkex.errormsg(_("Neither file:// nor data:image/png; prefix. Cannot parse PNG image href "+href))
+        inkex.errormsg(_("Neither file:// nor data:image/; prefix. Cannot parse PNG/JPEG image href "+href[:200]+"..."))
         sys.exit(1)
       if debug: print >>self.tty, "filename="+filename
       #
@@ -540,7 +547,7 @@ class TraceCenterline(inkex.Effect):
       ## insert the new path object
       inkex.etree.SubElement(self.current_layer, inkex.addNS('path', 'svg'), path_attr)
       ## delete the old image object
-      if self.replace_image: 
+      if self.replace_image:
         node.getparent().remove(node)
         if cliprect is not None:        # and its cliprect ...
           cliprect['node'].getparent().remove(cliprect['node'])
