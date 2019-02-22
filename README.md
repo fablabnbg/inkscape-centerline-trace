@@ -22,13 +22,13 @@ Installation hints
 * **Install autotrace / python-pil**
     * **Windows**
         * Instructions for Inkscape 0.92.2 and higher: 
-            * Install autotrace win64-setup.zip version 0.40.0 or later from e.g. https://github.com/jnweiger/autotrace/releases
+            * Install autotrace win64-setup.zip version 0.40.0 or later from e.g. https://github.com/autotrace/autotrace/releases
               Make sure the installation path is C:\Program Files (x86)\AutoTrace -- this application searches there.
               - Older version: [autotrace binary](https://github.com/scottvr/autotrace-win64-binaries/raw/master/bin/autotrace.exe) from [autotrace-win64-binaries github repo](https://github.com/scottvr/autotrace-win64-binaries))
                 Copy the downloaded autotrace.exe to Inkscape's User extensions folder, that should also work.
         * Instructions for Inkscape 0.92: https://inkscape.org/en/gallery/item/10567/centerline_NIH0Rhk.pdf
     * **MacOS**
-        * Install autotrace MacOS.zip version 0.40.0 or later from e.g. https://github.com/jnweiger/autotrace/releases
+        * Install autotrace MacOS.zip version 0.40.0 or later from e.g. https://github.com/autotrace/autotrace/releases
         * open a command line shell to install the python-PIL module:
           + `sudo easy_install install pip`
           + `sudo pip install pillow`
@@ -38,7 +38,7 @@ Installation hints
           + `curl https://raw.githubusercontent.com/fablabnbg/inkscape-centerline-trace/master/centerline-trace.inx -o centerline-trace.inx`
         * Please report success in the github issues. As of 2018-08-31, MacOS Support is back, but highly experimental.
     * **GNU/Linux**      
-        * Install the autotrace DEB package version 0.40.0 or later from e.g. https://github.com/jnweiger/autotrace/releases
+        * Install the autotrace DEB package version 0.40.0 or later from e.g. https://github.com/autotrace/autotrace/releases
         * if you do not have pillow/pil installed, the extension will output an error message prompting you to install it. On Ubuntu and derivatives, run `sudo apt-get install python-pil` to install.
 
 
