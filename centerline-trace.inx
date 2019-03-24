@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <inkscape-extension xmlns="http://www.inkscape.org/namespace/inkscape/extension">
-  <_name>Centerline Trace v0.8c</_name><!-- CAUTION: keep in sync with line 24 below and centerline_trace.py ca. line 55 __version__ = ... -->
+  <_name>Centerline Trace v0.8d</_name><!-- CAUTION: keep in sync with line 24 below and centerline_trace.py ca. line 55 __version__ = ... -->
   <id>com.github.fablabnbg.inskscape-centerline-trace</id>
   <dependency type="extension">org.inkscape.output.svg.inkscape</dependency>
-  <dependency type="executable" location="extensions">inkex.py</dependency>
   <dependency type="executable" location="extensions">centerline-trace.py</dependency>
 
   <param name="remove" type="boolean" _gui-text="Replace image with vector graphics. (Default: Place on top)">false</param>
@@ -25,12 +24,12 @@
   </param>
   <param name="at-filter-iterations" type="int" min="0" max="20" _gui-text="--filter-iterations [0..20] (Default: 4)">4</param>
   <param name="at-error-threshold" type="float" min="1.0" max="5.0" precision="2" _gui-text="--error-threshold [1.0..5.0] (Default: 2.0)">2.0</param>
-  <param name="about_who" type="description">(C) 2016-2018 Jürgen Weigert (juergen@fabmail.org) and contributors.
+  <param name="about_who" type="description">(C) 2016-2019 Jürgen Weigert (juergen@fabmail.org) and contributors.
   For updates, praise or bug reports please refer to
   https://github.com/fablabnbg/inkscape-centerline-trace
   </param>
   <!-- CAUTION: Keep in sync with line 3 above and with centerline_trace.py ca. line 61 __version__ = ... -->
-  <param name="about_version" type="description">Version 0.8c</param>
+  <param name="about_version" type="description">Version 0.8d</param>
 
   <effect needs-live-preview="false" >
     <object-type>path</object-type>

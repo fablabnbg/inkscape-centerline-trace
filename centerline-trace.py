@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #
 # Inkscape extension to vectorize bitmaps by tracing along the center of lines
 # (C) 2016 juewei@fabmail.org
@@ -60,9 +60,10 @@
 #                         Fixed stroke_width of scaled images.
 # 2018-09-04 jw, V0.8c -- Fixed https://github.com/fablabnbg/inkscape-centerline-trace/issues/28
 #                         Hints for https://github.com/fablabnbg/inkscape-centerline-trace/issues/27 added.
+# 2019-03-24 jw, V0.8d -- Pad one pixel border to images, so that lines touching edges are recognized by autotrace.
 
 
-__version__ = '0.8c'	# Keep in sync with centerline-trace.inx ca. line 3 and 24
+__version__ = '0.8d'	# Keep in sync with centerline-trace.inx ca. line 3 and 24
 __author__ = 'Juergen Weigert <juergen@fabmail.org>'
 
 import sys, os, re, math, tempfile, subprocess, base64, time
@@ -252,6 +253,9 @@ class TraceCenterline(inkex.Effect):
 
     if self.invert_image: im = ImageOps.invert(im)
 
+    ### Add a one pixel padding around the image. Otherwise autotrace fails when a line touches the edge of the image.
+    im = ImageOps.expand(im, border=1, fill=255)
+
     if self.filter_median > 0:
       if self.filter_median % 2 == 0: self.filter_median = self.filter_median + 1	# need odd values.
       im = im.filter(ImageFilter.MedianFilter(size=self.filter_median))	                # feeble denoise attempt. FIXME: try ROF instead.
@@ -322,6 +326,7 @@ class TraceCenterline(inkex.Effect):
 
     for i in range(num_attempts):
       threshold = int(256.*(1+i)/(num_attempts+1))
+      # make lookup table that maps to black/white using threshold.
       lut = [ 255 for n in range(threshold) ] + [ 0 for n in range(threshold,256) ]
       if debug: print >>self.tty, "attempt "+ str(i)
       bw = im.point(lut, mode='1')
