@@ -43,6 +43,7 @@ Installation hints
         * if you do not have pillow/pil installed, the extension will output an error message prompting you to install it. On Ubuntu and derivatives, run `sudo apt-get install python-pil` to install.
         
 * Finally, restart inkscape, and find CenterlineTrace in the `Extensions -> Images` menue.
+* Since Inkscape 1.0 the Autotrace library including the CenterlineTrace feature is integrated. That should obsolete this extension. Find an entry in the new `Path -> Trace Bitmap` dialog.
 
 
 Algorithm
