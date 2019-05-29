@@ -45,6 +45,8 @@ Installation hints
 * Finally, restart inkscape, and find CenterlineTrace in the `Extensions -> Images` menue.
 * Since Inkscape 1.0 the Autotrace library including the CenterlineTrace feature is integrated. That should obsolete this extension. Find an entry in the new `Path -> Trace Bitmap` dialog.
 
+<a href="https://raw.githubusercontent.com/fablabnbg/inkscape-centerline-trace/master/testdata/20190528_195103.jpg"><img src="https://raw.githubusercontent.com/fablabnbg/inkscape-centerline-trace/master/centerline-trace/testdata/20190528_195103.jpg" width="50%"/></a>
+
 
 Algorithm
 ---------
