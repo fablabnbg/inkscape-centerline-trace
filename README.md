@@ -17,6 +17,7 @@ Installation hints
 ------------------
 * **Install the extension (all operating systems)**
     * the extension requires the installation of autotrace and python-pil (see below)
+    * grab a [binary package](https://github.com/fablabnbg/inkscape-centerline-trace/releases) **or**
     * download the [zip file](https://github.com/fablabnbg/inkscape-centerline-trace/archive/master.zip) of [inkscape-centerline-trace](https://github.com/fablabnbg/inkscape-centerline-trace) and unpack it
     * copy the files centerline-trace.inx, centerline-trace.py to your Inkscape User extensions folder (see Edit > Preferences > System: System info: User extensions)
 * **Install autotrace / python-pil**
@@ -40,6 +41,8 @@ Installation hints
     * **GNU/Linux**      
         * Install the autotrace DEB package version 0.40.0 or later from e.g. https://github.com/autotrace/autotrace/releases
         * if you do not have pillow/pil installed, the extension will output an error message prompting you to install it. On Ubuntu and derivatives, run `sudo apt-get install python-pil` to install.
+        
+* Finally, restart inkscape, and find CenterlineTrace in the `Extensions -> Images` menue.
 
 
 Algorithm
