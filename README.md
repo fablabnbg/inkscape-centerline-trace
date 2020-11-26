@@ -5,6 +5,8 @@ A bitmap vectorizer that can trace along the centerline of a stroke. The builtin
 
 Download <a href="https://github.com/fablabnbg/inkscape-centerline-trace/releases">Source code and Debian/Ubuntu package</a>
 
+NOTE: This is python2 code. It probably does not run with inkscape 1.0.1 -- it was developed and tested for inkscape 0.92.3
+
 Written with python-Pillow. 
 It uses 'autotrace -centerline' and an optimal threshold to vectorize a pixel image.
 See centerline-tracing.svg for an illustration of the idea.
